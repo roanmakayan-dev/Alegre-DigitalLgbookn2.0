@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notifications | Digital Logbook</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/notifications.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+  </head>
+
+  <body>
+    <div class="background-container">
+      <!-- TOP NAVBAR -->
+      <nav class="top-navbar">
+        <div class="nav-container">
+          <div class="nav-left">
+            <div class="admin-info">
+              <img src="assets/logo.png" alt="Logo" />
+            </div>
+            <h2 class="nav-title">ADMIN DIGITAL LOGBOOK</h2>
+          </div>
+
+          <ul class="nav-menu">
+            <li>
+              <a href="dashboard.html">
+                <i class="fa-solid fa-chart-simple"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="student_records.html">
+                <i class="fa-solid fa-users"></i>
+                <span>Student Records</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="dcp.html">
+                <i class="fa-solid fa-laptop"></i>
+                <span>DCP Package</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="transaction.html">
+                <i class="fa-solid fa-folder"></i>
+                <span>Transaction</span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="nav-controls">
+            <!-- Admin Profile Dropdown -->
+            <div class="admin-profile-container">
+              <button
+                class="admin-profile-btn"
+                onclick="toggleProfileDropdown()"
+                title="Admin Profile"
+              >
+                <i
+                  class="fa-solid fa-user admin-avatar-icon"
+                  aria-hidden="true"
+                ></i>
+              </button>
+              <div class="profile-dropdown" id="profileDropdown">
+                <div class="profile-header">
+                  <i
+                    class="fa-solid fa-circle-user profile-avatar-icon"
+                    aria-hidden="true"
+                  ></i>
+                  <div class="profile-info">
+                    <h3 id="profileUsername">Administrator</h3>
+                    <p id="profileEmail">admin@logbook.com</p>
+                  </div>
+                </div>
+                <div class="profile-divider"></div>
+                <button class="profile-menu-item" onclick="showEditProfile()">
+                  <i class="fa-solid fa-user-pen"></i>
+                  <span>Profile</span>
+                </button>
+                <button
+                  class="profile-menu-item"
+                  onclick="window.location.href = 'notifications.html'"
+                >
+                  <i class="fa-solid fa-bell"></i>
+                  <span>Notifications</span>
+                </button>
+                <button
+                  class="profile-menu-item"
+                  onclick="window.location.href = 'settings.html'"
+                >
+                  <i class="fa-solid fa-gear"></i>
+                  <span>Settings</span>
+                </button>
+                <button class="profile-menu-item" onclick="logout()">
+                  <i class="fa-solid fa-sign-out-alt"></i>
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- MAIN CONTENT -->
+      <div class="main-content">
+        <!-- NOTIFICATIONS PANEL -->
+        <div class="notifications-wrapper">
+          <div class="notifications-header">
+            <h1>Notifications</h1>
+            <div class="notif-controls">
+            </div>
+          </div>
+
+          <!-- SECTION TABS -->
+          <div class="section-tabs">
+            <button class="section-tab active" onclick="switchNotificationTab('unread')">
+               Unread 
+            </button>
+            <button class="section-tab" onclick="switchNotificationTab('read')">
+               Read 
+            </button>
+          </div>
+
+          <!-- UNREAD NOTIFICATIONS SECTION -->
+          <div id="unreadSection" class="section-content active-section">
+            <div class="table-wrapper">
+              <table id="unreadTable">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Message</th>
+                    <th>Date & Time</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="unreadBody">
+                  <!-- Unread notifications will be populated here -->
+                </tbody>
+              </table>
+              <div id="emptyUnread" class="empty-state" style="display: none">
+                <p>✓ All caught up! No unread notifications</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- READ NOTIFICATIONS SECTION -->
+          <div id="readSection" class="section-content">
+            <div class="table-wrapper">
+              <table id="readTable">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Message</th>
+                    <th>Date & Time</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="readBody">
+                  <!-- Read notifications will be populated here -->
+                </tbody>
+              </table>
+              <div id="emptyRead" class="empty-state" style="display: none">
+                <p>📭 No read notifications</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ Loading Modal -->
+    <div id="loadingModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <div class="spinner"></div>
+        <p id="loadingText">Processing...</p>
+      </div>
+    </div>
+
+    <!-- ✅ Confirmation Modal -->
+    <div id="confirmModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <p id="confirmText"></p>
+        <div class="buttons">
+          <button id="confirmYes" class="yes-btn">Yes</button>
+          <button id="confirmNo" class="no-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/profile.js"></script>
+    <script src="/js/notifications.js"></script>
+  </body>
+</html>

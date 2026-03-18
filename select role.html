@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Select Role | Digital Logbook</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-image: url('/assets/mouse.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('assets/bg.jpg');
+      background-size: cover;
+      background-position: center;
+      filter: blur(10px);
+      z-index: -1;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 60px 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 800px;
+      width: 100%;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .logo {
+      font-size: 50px;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      color: #1f2937;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .header p {
+      font-size: 16px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    .role-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .role-card {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      border: 3px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 40px 25px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .role-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(102, 126, 234, 0.05);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .role-card:hover {
+      border-color: #667eea;
+      transform: translateY(-5px);
+      box-shadow: 0 12px 28px rgba(102, 126, 234, 0.25);
+    }
+
+    .role-card:hover::before {
+      opacity: 1;
+    }
+
+    .role-card.selected {
+      border-color: #667eea;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+      box-shadow: 0 12px 28px rgba(102, 126, 234, 0.25);
+    }
+
+    .role-icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+      color: #667eea;
+    }
+
+    .role-card.selected .role-icon {
+      color: #764ba2;
+    }
+
+    .role-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 10px;
+    }
+
+    .role-desc {
+      font-size: 14px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    .actions {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 12px 32px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-proceed {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      flex: 1;
+      max-width: 300px;
+    }
+
+    .btn-proceed:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-proceed:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-back {
+      background: #e5e7eb;
+      color: #1f2937;
+    }
+
+    .btn-back:hover {
+      background: #d1d5db;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 40px 20px;
+      }
+
+      .role-selector {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .btn-proceed {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">
+        <i class="fas fa-book"></i>
+      </div>
+      <h1>Digital Logbook System</h1>
+      <p>Please select your role to continue</p>
+    </div>
+
+    <div class="role-selector">
+      <!-- Student Role Option -->
+      <div class="role-card" onclick="selectRole('student', this)">
+        <div class="role-icon">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="role-title">Student</div>
+        <div class="role-desc">Access your equipment borrowing dashboard and track your items</div>
+      </div>
+
+      <!-- Administrator Role Option -->
+      <div class="role-card" onclick="selectRole('admin', this)">
+        <div class="role-icon">
+          <i class="fas fa-user-shield"></i>
+        </div>
+        <div class="role-title">Administrator</div>
+        <div class="role-desc">Manage inventory, students, and system settings</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-back" onclick="goHome()">
+        <i class="fas fa-arrow-left"></i> Home
+      </button>
+      <button class="btn btn-proceed" id="proceedBtn" onclick="proceedLogin()" disabled>
+        Continue <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let selectedRole = null;
+
+    function selectRole(role, element) {
+      selectedRole = role;
+
+      // Remove selected class from all cards
+      document.querySelectorAll('.role-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+
+      // Add selected class to clicked card
+      element.classList.add('selected');
+
+      // Enable proceed button
+      document.getElementById('proceedBtn').disabled = false;
+    }
+
+    function proceedLogin() {
+      if (!selectedRole) {
+        alert('Please select a role');
+        return;
+      }
+
+      if (selectedRole === 'student') {
+        window.location.href = 'student login.html';
+      } else if (selectedRole === 'admin') {
+        window.location.href = 'admin-login.html';
+      }
+    }
+
+    function goHome() {
+      window.location.href = 'home.html';
+    }
+
+    // Check if already logged in
+    window.addEventListener('DOMContentLoaded', function () {
+      const currentUser = localStorage.getItem('currentUser');
+      if (currentUser) {
+        const user = JSON.parse(currentUser);
+        if (user.role === 'student') {
+          window.location.href = 'junior dashboard.html';
+        } else if (user.role === 'admin') {
+          window.location.href = 'dashboard.html';
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login | Digital Logbook</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-image: url('assets/bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('assets/bg.jpg');
+            background-size: cover;
+            background-position: center;
+            filter: blur(5px);
+            z-index: -1;
+        }
+
+        .auth-container {
+            background-image: url('assets/bg.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            position: relative;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.05);
+            background-color: #ffffff;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .auth-header {
+            background: transparent;
+            color: #ffffff;
+            padding: 30px 30px 20px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .school-logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 40px;
+        }
+
+        .school-logo {
+            background-image: url('assets/logo.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .auth-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: block;
+            color: #000000;
+        }
+
+        .auth-header p {
+            font-size: 13px;
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .admin-badge {
+            display: inline-block;
+            background: rgba(220, 38, 38, 0.2);
+            color: black;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+            border: 1px solid rgba(220, 38, 38, 0.4);
+        }
+
+        .auth-body {
+            padding: 40px 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid black;
+            border-radius: 6px;
+            background-color: #ffffff;
+            color: #000000;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input::placeholder {
+            color:#999999;
+    
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #dc2626;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background: #dc2626;
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            margin-top: 25px;
+        }
+
+        .auth-btn:hover {
+            background: #b91c1c;
+            box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);
+        }
+
+        .auth-link {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #000000;
+           
+        }
+
+        .auth-link a {
+            color: #fca5a5;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .auth-link a:hover {
+            color: #fdcccf;
+            text-decoration: underline;
+        }
+
+        .error-msg {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+            border-left: 4px solid #dc2626;
+        }
+
+        .error-msg.show {
+            display: block;
+        }
+
+        .success-msg {
+            background: #dcfce7;
+            color: #166534;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+            border-left: 4px solid #22c55e;
+        }
+
+        .success-msg.show {
+            display: block;
+        }
+
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: blue;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 6px;
+        }
+
+        .back-link:hover {
+            gap: 15px;
+            background: rgba(255, 255, 255, 1);
+        }
+
+        @media (max-width: 480px) {
+            .auth-container {
+                border-radius: 12px;
+            }
+
+            .auth-header {
+                padding: 30px 20px 20px;
+            }
+
+            .auth-header h1 {
+                font-size: 24px;
+            }
+
+            .auth-body {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="select role.html" class="back-link">
+        <i class="fas fa-arrow-left"></i> Back 
+    </a>
+
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="school-logo">
+            </div>
+            <h1>Digital Logbook System</h1>
+            <div class="admin-badge">
+                <i class="fas fa-user-shield"></i> Administrator Panel
+            </div>
+        </div>
+
+        <div class="auth-body">
+            <!-- ADMIN LOGIN FORM -->
+            <div class="error-msg" id="adminError"></div>
+            <div class="success-msg" id="adminSuccess"></div>
+
+            <form id="adminForm" onsubmit="handleAdminLoginForm(event)">
+                <div class="form-group">
+                    <label for="adminUsername">Username</label>
+                    <input type="text" id="adminUsername" name="adminUsername" required
+                        placeholder="Enter your username">
+                </div>
+
+                <div class="form-group">
+                    <label for="adminPassword">Password</label>
+                    <input type="password" id="adminPassword" name="adminPassword" required
+                        placeholder="Enter your password">
+                </div>
+
+                <button type="submit" class="auth-btn">
+                    <i class="fas fa-sign-in-alt"></i> Login as Admin
+                </button>
+            </form>
+
+            <p class="auth-link" style="text-align: center; margin-top: 20px; font-size: 13px;">
+                <a href="reset password.html" style="color:blue;">Forgot password?</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Utility functions
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.innerHTML = message;
+            element.classList.add('show');
+            clearMessages(elementId);
+        }
+
+        function showSuccess(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.innerHTML = message;
+            element.classList.add('show');
+        }
+
+        function clearMessages(exclude = null) {
+            const errors = document.querySelectorAll('.error-msg.show');
+            const successes = document.querySelectorAll('.success-msg.show');
+
+            errors.forEach(e => {
+                if (!exclude || e.id !== exclude) {
+                    setTimeout(() => e.classList.remove('show'), 3000);
+                }
+            });
+
+            successes.forEach(s => {
+                if (!exclude || s.id !== exclude) {
+                    setTimeout(() => s.classList.remove('show'), 3000);
+                }
+            });
+        }
+
+        // Handle Admin Login Form
+        function handleAdminLoginForm(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('adminUsername').value.trim();
+            const password = document.getElementById('adminPassword').value.trim();
+
+            if (!username || !password) {
+                showError('adminError', 'Please fill in all fields.');
+                return;
+            }
+
+            handleAdminLogin(username, password);
+        }
+
+        // Admin Login Handler
+        function handleAdminLogin(username, password) {
+            // Get stored admin credentials from localStorage or use defaults
+            const storedAdmin = JSON.parse(localStorage.getItem('adminCredentials')) || {
+                username: 'admin',
+                password: 'developer',
+                email: 'admin@logbook.com'
+            };
+
+            // Validate credentials (case-insensitive username)
+            if (username.toLowerCase() !== storedAdmin.username.toLowerCase() || password !== storedAdmin.password) {
+                showError('adminError', 'Invalid username or password.');
+                return;
+            }
+
+            // Store current user as admin with complete profile
+            localStorage.setItem('currentUser', JSON.stringify({
+                username: username,
+                email: storedAdmin.email || 'admin@logbook.com',
+                role: 'admin'
+            }));
+
+            showSuccess('adminSuccess', 'Login successful! Redirecting...');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 500);
+        }
+
+        // Check if already logged in
+        window.addEventListener('DOMContentLoaded', function () {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                if (user.role === 'admin') {
+                    window.location.href = 'dashboard.html';
+                } else if (user.role === 'student') {
+                    window.location.href = 'user dashboard.html';
+                }
+            }
+        });
+        
+    </script>
+
+</body>
+
+</html>

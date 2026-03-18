@@ -1,0 +1,2542 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Junior High Dashboard | Advanced Equipment Reservation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+    
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #ec4899;
+      --accent: #06b6d4;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --info: #3b82f6;
+      --glass: rgba(255, 255, 255, 0.7);
+      --junior-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      --urgent-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    body { 
+      background: var(--junior-gradient);
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--text);
+    }
+    
+    .mobile-container {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: var(--bg);
+      position: relative;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+      overflow-x: hidden;
+    }
+    
+    .bg-shapes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 320px;
+      background: var(--junior-gradient);
+      border-radius: 0 0 40px 40px;
+      z-index: 0;
+    }
+    
+    .bg-shapes::before {
+      content: '';
+      position: absolute;
+      top: 50px;
+      right: -50px;
+      width: 200px;
+      height: 200px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .bg-shapes::after {
+      content: '';
+      position: absolute;
+      bottom: 50px;
+      left: -30px;
+      width: 150px;
+      height: 150px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 50%;
+      animation: float 8s ease-in-out infinite reverse;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-20px) scale(1.1); }
+    }
+    
+    .header {
+      position: relative;
+      z-index: 10;
+      padding: 20px;
+      color: white;
+    }
+    
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .menu-btn {
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .menu-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .user-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.16);
+      position: relative;
+      border: 2px solid rgba(16,185,129,0.65);
+      overflow: hidden;
+    }
+
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    
+    .user-avatar::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 12px;
+      height: 12px;
+      background: var(--success);
+      border: 2px solid white;
+      border-radius: 50%;
+    }
+    
+    .user-text h1 {
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0.9;
+      margin-bottom: 2px;
+    }
+    
+    .user-text p {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    
+    .hero-card {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 24px;
+      padding: 24px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 200px;
+      height: 200px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+    }
+    
+    .hero-content { position: relative; z-index: 2; }
+    
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.2);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .hero-title {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+    
+    .hero-subtitle {
+      font-size: 13px;
+      opacity: 0.9;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+    
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .hero-btn {
+      background: white;
+      color: #667eea;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      transition: all 0.3s;
+      flex: 1;
+      justify-content: center;
+    }
+    
+    .hero-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+    
+    .hero-btn-secondary {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 2px solid rgba(255,255,255,0.3);
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+      flex: 1;
+      justify-content: center;
+    }
+    
+    .hero-btn-secondary:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); }
+    
+    .hero-icon {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      font-size: 80px;
+      opacity: 0.2;
+      animation: pulse 3s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.2; }
+      50% { transform: scale(1.1); opacity: 0.3; }
+    }
+    
+    .content {
+      background: var(--bg);
+      border-radius: 30px 30px 0 0;
+      min-height: calc(100vh - 300px);
+      position: relative;
+      z-index: 5;
+      padding: 24px 20px 100px;
+      margin-top: -20px;
+    }
+    
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    
+    .see-all {
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .category-scroll {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 24px;
+      scrollbar-width: none;
+    }
+    
+    .category-scroll::-webkit-scrollbar { display: none; }
+    
+    .category-pill {
+      padding: 10px 18px;
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .category-pill.active {
+      background: var(--junior-gradient);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .category-pill:hover:not(.active) {
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-2px);
+    }
+    
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    
+    .item-card {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      border: 1px solid #f1f5f9;
+      position: relative;
+    }
+    
+    .item-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    }
+    
+    .item-card:active { transform: scale(0.98); }
+    
+    .quick-borrow-btn {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: var(--urgent-gradient);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: all 0.3s;
+    }
+    
+    .quick-borrow-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    
+    .card-image-wrapper {
+      height: 120px;
+      background: var(--junior-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .card-image-wrapper::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(to top, rgba(0,0,0,0.3), transparent);
+    }
+    
+    .card-icon {
+      font-size: 48px;
+      z-index: 2;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+    }
+    
+    .card-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255,255,255,0.95);
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text);
+      z-index: 3;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .card-content {
+      padding: 14px;
+    }
+    
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+    
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .card-status {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .status-available {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+    
+    .status-reserved {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+    }
+    
+    .status-unavailable {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--error);
+    }
+    
+    .card-qty {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    
+    .request-card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border-left: 4px solid var(--primary);
+      transition: all 0.3s;
+    }
+    
+    .request-card:hover { transform: translateX(4px); }
+    
+    .request-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    
+    .request-item {
+      font-weight: 700;
+      color: var(--text);
+      font-size: 15px;
+    }
+    
+    .request-status {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    
+    .status-pending { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+    .status-approved { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+    .status-rejected { background: rgba(239, 68, 68, 0.1); color: var(--error); }
+    .status-returned { background: rgba(99, 102, 241, 0.1); color: var(--primary); }
+    
+    .request-details {
+      color: var(--text-muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    
+    .request-details p { margin-bottom: 4px; }
+    
+    .time-slot-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(99, 102, 241, 0.1);
+      color: var(--primary);
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+    
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      background: white;
+      padding: 12px 24px 24px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+      border-radius: 24px 24px 0 0;
+      z-index: 100;
+    }
+    
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 16px;
+      transition: all 0.3s;
+      position: relative;
+    }
+    
+    .nav-item i {
+      font-size: 20px;
+      transition: all 0.3s;
+    }
+    
+    .nav-item.active {
+      color: var(--primary);
+      background: rgba(99, 102, 241, 0.1);
+    }
+    
+    .nav-item.active i {
+      transform: translateY(-2px);
+    }
+    
+    .nav-badge {
+      position: absolute;
+      top: 4px;
+      right: 8px;
+      background: var(--error);
+      color: white;
+      font-size: 9px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .modal.show {
+      display: flex;
+      opacity: 1;
+    }
+    
+    .modal-content {
+      background: white;
+      width: 100%;
+      max-width: 480px;
+      border-radius: 30px 30px 0 0;
+      padding: 24px;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .modal.show .modal-content {
+      transform: translateY(0);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    
+    .modal-close {
+      width: 36px;
+      height: 36px;
+      background: #f1f5f9;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.3s;
+    }
+    
+    .modal-close:hover { background: #e2e8f0; color: var(--text); }
+    
+    .form-group { margin-bottom: 16px; }
+    
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 14px;
+      transition: all 0.3s;
+      background: #f8fafc;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: white;
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+    
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    
+    .time-mode-toggle {
+      display: flex;
+      background: #f1f5f9;
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 16px;
+    }
+    
+    .time-mode-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .time-mode-btn.active {
+      background: white;
+      color: var(--primary);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .time-slots-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+    
+    .time-slot {
+      padding: 10px 8px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.3s;
+      background: white;
+    }
+    
+    .time-slot:hover:not(.disabled):not(.selected) {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    
+    .time-slot.selected {
+      background: var(--junior-gradient);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .time-slot.disabled {
+      background: #f1f5f9;
+      color: #cbd5e1;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    
+    .time-slot.booked {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--error);
+      border-color: rgba(239, 68, 68, 0.3);
+      cursor: not-allowed;
+    }
+    
+    .custom-time-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    
+    .time-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    
+    .time-input-group label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    
+    .time-input {
+      padding: 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      text-align: center;
+      color: var(--text);
+      background: #f8fafc;
+      transition: all 0.3s;
+    }
+    
+    .time-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: white;
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+    
+    .btn-primary {
+      width: 100%;
+      padding: 16px;
+      background: var(--junior-gradient);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      margin-top: 8px;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+    
+    .btn-primary:active { transform: scale(0.98); }
+    
+    .btn-urgent {
+      width: 100%;
+      padding: 16px;
+      background: var(--urgent-gradient);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn-urgent:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(240, 147, 251, 0.5);
+    }
+    
+    .btn-secondary {
+      flex: 1;
+      padding: 12px 16px;
+      background: rgba(99, 102, 241, 0.1);
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn-secondary:hover {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+    
+    .empty-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    
+    .empty-text {
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: #1e293b;
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      z-index: 2000;
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    
+    .toast-icon {
+      width: 24px;
+      height: 24px;
+      background: var(--success);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    
+    .page-section { display: none; animation: fadeIn 0.4s ease; }
+    .page-section.active { display: block; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 16px;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .profile-card {
+      background: white;
+      border-radius: 28px;
+      padding: 26px 20px 20px;
+      margin: 0 18px 16px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.12);
+      position: relative;
+      top: -26px;
+      text-align: center;
+    }
+
+    .profile-card .profile-avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin: 0 auto 12px;
+      border: 4px solid rgba(34,197,94,0.35);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+    }
+
+    .profile-card .profile-name {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .profile-card .profile-email {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .profile-menu {
+      margin: 0 18px 120px;
+    }
+
+    .profile-menu-item {
+      width: 100%;
+      background: white;
+      padding: 14px 16px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 14px 25px rgba(0,0,0,0.07);
+      border: 1px solid rgba(226,232,240,0.8);
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .profile-menu-item:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 30px rgba(0,0,0,0.12);
+    }
+
+    .profile-menu-item-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .profile-menu-item-label {
+      flex: 1;
+      margin-left: 12px;
+      font-weight: 600;
+      color: var(--text);
+      text-align: left;
+    }
+
+    .profile-menu-item-arrow {
+      color: rgba(107,114,128,0.8);
+      font-size: 14px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    
+    .stat-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    
+    .stat-icon.purple { background: rgba(99, 102, 241, 0.1); color: var(--primary); }
+    .stat-icon.green { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+    .stat-icon.orange { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+    .stat-icon.red { background: rgba(239, 68, 68, 0.1); color: var(--error); }
+    
+    .date-picker {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+      scrollbar-width: none;
+    }
+    
+    .date-picker::-webkit-scrollbar { display: none; }
+    
+    .date-option {
+      min-width: 70px;
+      padding: 12px;
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .date-option.active {
+      background: var(--junior-gradient);
+      color: white;
+      border-color: transparent;
+    }
+    
+    .date-day {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+    
+    .date-num {
+      font-size: 20px;
+      font-weight: 800;
+      margin: 4px 0;
+    }
+    
+    .date-month {
+      font-size: 10px;
+      opacity: 0.8;
+    }
+    
+    .info-box {
+      background: rgba(99, 102, 241, 0.1);
+      border-left: 4px solid var(--primary);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: var(--text);
+    }
+    
+    .info-box strong {
+      color: var(--primary);
+    }
+    
+    .reservation-timer {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border: 2px solid #7dd3fc;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .timer-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .timer-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary);
+      font-variant-numeric: tabular-nums;
+    }
+    
+    .borrow-now-banner {
+      background: var(--urgent-gradient);
+      color: white;
+      padding: 16px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      animation: slideIn 0.5s ease;
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .borrow-now-content h4 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .borrow-now-content p {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+    
+    .borrow-now-btn {
+      background: white;
+      color: #f5576c;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .borrow-now-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    @media (max-width: 380px) {
+      .items-grid { grid-template-columns: 1fr; }
+      .hero-title { font-size: 20px; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .time-slots-grid { grid-template-columns: repeat(2, 1fr); }
+      .hero-actions { flex-direction: column; }
+    }
+    
+    @media (min-width: 768px) {
+      body {
+        background: #0f172a;
+        padding: 40px 20px;
+      }
+      .mobile-container {
+        border-radius: 40px;
+        min-height: 800px;
+        height: 90vh;
+        overflow-y: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-container">
+    <div class="bg-shapes"></div>
+    
+    <header class="header">
+      <div class="header-top">
+        <button class="menu-btn" onclick="toggleMenu()">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="user-info">
+          <div class="user-avatar">
+            <img id="headerAvatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" alt="Avatar" class="w-full h-full object-cover" />
+          </div>
+          <div class="user-text">
+            <h1>Welcome back!</h1>
+            <p id="userName">Junior High Student</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="hero-card">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <i class="fas fa-graduation-cap"></i>
+            Junior high student
+          </div>
+          <h2 class="hero-title">Advanced Equipment Reservation</h2>
+          <p class="hero-subtitle">Reserve STEM equipment with custom time slots or borrow immediately.</p>
+          <div class="hero-actions">
+            <button class="hero-btn" onclick="showSection('reserve')">
+              <i class="fas fa-calendar-alt"></i>
+              Reserve
+            </button>
+            <button class="hero-btn-secondary" onclick="showBorrowNowModal()">
+              <i class="fas fa-bolt"></i>
+              Borrow Now
+            </button>
+          </div>
+        </div>
+        <i class="fas fa-microscope hero-icon"></i>
+      </div>
+    </header>
+
+    <main class="content">
+      <!-- Dashboard Section -->
+      <div id="dashboardSection" class="page-section active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon purple"><i class="fas fa-box-open"></i></div>
+            <div class="stat-label">Available</div>
+            <div class="stat-value" id="availableCount">32</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
+            <div class="stat-label">Active</div>
+            <div class="stat-value" id="activeCount">0</div>
+          </div>
+        </div>
+        
+        <div class="section-header">
+          <h3 class="section-title">STEM Categories</h3>
+        </div>
+        <div class="category-scroll hide-scrollbar">
+          <button class="category-pill active" onclick="filterCategory('all', this)">
+            <i class="fas fa-th-large"></i> All
+          </button>
+          <button class="category-pill" onclick="filterCategory('robotics', this)">
+            <i class="fas fa-robot"></i> Robotics
+          </button>
+          <button class="category-pill" onclick="filterCategory('biotech', this)">
+            <i class="fas fa-dna"></i> BioTech
+          </button>
+          <button class="category-pill" onclick="filterCategory('engineering', this)">
+            <i class="fas fa-cogs"></i> Engineering
+          </button>
+          <button class="category-pill" onclick="filterCategory('av', this)">
+            <i class="fas fa-video"></i> Media
+          </button>
+        </div>
+        
+        <div class="section-header">
+          <h3 class="section-title">Featured Equipment</h3>
+          <a href="#" class="see-all" onclick="showSection('reserve')">See All <i class="fas fa-chevron-right"></i></a>
+        </div>
+        <div class="items-grid" id="dashboardGrid"></div>
+      </div>
+
+      <!-- Reservation Section -->
+      <div id="reserveSection" class="page-section">
+        <div class="section-header">
+          <h3 class="section-title">Reserve Equipment</h3>
+        </div>
+        <div class="items-grid" id="reserveGrid"></div>
+      </div>
+
+      <!-- My Reservations Section -->
+      <div id="reservationsSection" class="page-section">
+        <div class="reservation-timer" id="activeTimer" style="display: none;">
+          <div class="timer-label">Time Remaining</div>
+          <div class="timer-value" id="countdown">00:00:00</div>
+        </div>
+        
+        <div class="section-header">
+          <h3 class="section-title">My Reservations</h3>
+        </div>
+        <div id="reservationsList">
+          <div class="empty-state">
+            <div class="empty-icon">📅</div>
+            <p class="empty-text">No active reservations</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- History Section -->
+      <div id="historySection" class="page-section">
+        <div class="section-header">
+          <h3 class="section-title">History</h3>
+        </div>
+        <div id="historyList">
+          <div class="empty-state">
+            <div class="empty-icon">📚</div>
+            <p class="empty-text">No reservation history</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Section -->
+      <div id="profileSection" class="page-section">
+<div class="profile-card">
+        <div class="profile-avatar">
+          <img id="profileAvatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop" alt="Profile">
+        </div>
+        <h2 id="profileName" class="profile-name">Tracy Doce</h2>
+        <p id="profileEmail" class="profile-email">tracy.doce@example.com</p>
+      </div>
+      <div class="profile-menu">
+        <div class="profile-menu-item" data-action="edit">
+          <div class="flex items-center">
+            <div class="profile-menu-item-icon bg-emerald-100 text-emerald-500">
+              <i class="fas fa-user"></i>
+            </div>
+            <span class="profile-menu-item-label">Edit Profile</span>
+          </div>
+          <i class="fas fa-chevron-right profile-menu-item-arrow"></i>
+        </div>
+
+        <div class="profile-menu-item" data-action="notifications">
+          <div class="flex items-center">
+            <div class="profile-menu-item-icon bg-blue-100 text-blue-500">
+              <i class="fas fa-bell"></i>
+            </div>
+            <span class="profile-menu-item-label">Notifications</span>
+          </div>
+          <i class="fas fa-chevron-right profile-menu-item-arrow"></i>
+        </div>
+
+        <div class="profile-menu-item" data-action="security">
+          <div class="flex items-center">
+            <div class="profile-menu-item-icon bg-purple-100 text-purple-500">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <span class="profile-menu-item-label">Security</span>
+          </div>
+          <i class="fas fa-chevron-right profile-menu-item-arrow"></i>
+        </div>
+
+        <div class="profile-menu-item" data-action="settings">
+          <div class="flex items-center">
+            <div class="profile-menu-item-icon bg-orange-100 text-orange-500">
+              <i class="fas fa-cog"></i>
+            </div>
+            <span class="profile-menu-item-label">Settings</span>
+          </div>
+          <i class="fas fa-chevron-right profile-menu-item-arrow"></i>
+        </div>
+
+        <div class="profile-menu-item" data-action="logout">
+          <div class="flex items-center">
+            <div class="profile-menu-item-icon bg-red-100 text-red-500">
+              <i class="fas fa-sign-out-alt"></i>
+            </div>
+            <span class="profile-menu-item-label text-red-500">Logout</span>
+          </div>
+          <i class="fas fa-chevron-right profile-menu-item-arrow"></i>
+        </div>
+      </div>
+    </div>
+    </main>
+
+    <nav class="bottom-nav">
+      <a href="#" class="nav-item active" onclick="showSection('dashboard', this)">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="#" class="nav-item" onclick="showSection('reserve', this)">
+        <i class="fas fa-search"></i>
+        <span>Browse</span>
+      </a>
+      <a href="#" class="nav-item" onclick="showSection('reservations', this)">
+        <i class="fas fa-calendar-check"></i>
+        <span>My Slots</span>
+        <span class="nav-badge" id="navBadge" style="display: none;">0</span>
+      </a>
+      <a href="#" class="nav-item" onclick="showSection('history', this)">
+        <i class="fas fa-history"></i>
+        <span>History</span>
+      </a>
+      <a href="#" class="nav-item" onclick="showSection('profile', this)">
+        <i class="fas fa-user"></i>
+        <span>Profile</span>
+      </a>
+    </nav>
+
+    <!-- Reservation Modal -->
+    <div id="reservationModal" class="modal" onclick="closeModal(event)">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3 class="modal-title">Reserve Equipment</h3>
+          <button class="modal-close" onclick="closeReservationModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div id="itemDetails" style="margin-bottom: 20px;">
+          <div style="background: var(--junior-gradient); height: 150px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+            <span id="modalItemIcon" style="font-size: 64px;">🔬</span>
+          </div>
+          <h4 id="modalItemName" style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Equipment Name</h4>
+          <p id="modalItemDesc" style="color: var(--text-muted); font-size: 14px; line-height: 1.6; margin-bottom: 12px;"></p>
+          <div class="info-box">
+            <i class="fas fa-info-circle"></i> <strong>Custom Time:</strong> Select preset slots or set your own time between 8AM-5PM.
+          </div>
+        </div>
+        
+        <form id="reservationForm" onsubmit="submitReservation(event)">
+          <div class="form-group">
+            <label class="form-label">Select Date</label>
+            <div class="date-picker" id="datePicker"></div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Time Selection Mode</label>
+            <div class="time-mode-toggle">
+              <button type="button" class="time-mode-btn active" onclick="setTimeMode('preset', this)">Preset Slots</button>
+              <button type="button" class="time-mode-btn" onclick="setTimeMode('custom', this)">Custom Time</button>
+            </div>
+            
+            <!-- Preset Time Slots -->
+            <div id="presetTimeContainer">
+              <label class="form-label">Select Time Slot</label>
+              <div class="time-slots-grid" id="timeSlots"></div>
+            </div>
+            
+            <!-- Custom Time Input -->
+            <div id="customTimeContainer" style="display: none;">
+              <label class="form-label">Set Custom Time (8AM - 5PM)</label>
+              <div class="custom-time-inputs">
+                <div class="time-input-group">
+                  <label>Start Time</label>
+                  <input type="time" id="customStartTime" class="time-input" min="08:00" max="17:00" value="08:00" onchange="validateCustomTime()">
+                </div>
+                <div class="time-input-group">
+                  <label>End Time</label>
+                  <input type="time" id="customEndTime" class="time-input" min="08:00" max="17:00" value="17:00" onchange="validateCustomTime()">
+                </div>
+              </div>
+              <p id="timeError" style="color: var(--error); font-size: 12px; margin-top: 6px; display: none;">
+                <i class="fas fa-exclamation-circle"></i> End time must be after start time
+              </p>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Quantity</label>
+            <input type="number" id="reserveQuantity" class="form-input" min="1" value="1" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Purpose / Subject</label>
+            <select id="reservePurpose" class="form-input" required>
+              <option value="">Select purpose...</option>
+              <option value="research">Research Project</option>
+              <option value="thesis">Thesis / Capstone</option>
+              <option value="lab">Laboratory Activity</option>
+              <option value="competition">Competition / Event</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Notes (Optional)</label>
+            <textarea id="reserveNotes" class="form-input form-textarea" placeholder="Any special requirements..."></textarea>
+          </div>
+          
+          <button type="submit" class="btn-primary">
+            Confirm Reservation
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Borrow Now Modal -->
+    <div id="borrowNowModal" class="modal" onclick="closeModal(event)">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3 class="modal-title"><i class="fas fa-bolt" style="color: var(--warning);"></i> Borrow Now</h3>
+          <button class="modal-close" onclick="closeBorrowNowModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div class="info-box" style="background: rgba(245, 158, 11, 0.1); border-color: var(--warning);">
+          <i class="fas fa-clock"></i> <strong>Instant Borrow:</strong> Equipment will be reserved immediately from <strong>now</strong> until <strong>5:00 PM today</strong>.
+        </div>
+        
+        <div id="borrowNowGrid" style="max-height: 400px; overflow-y: auto;">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Borrow Confirmation Modal -->
+    <div id="quickBorrowModal" class="modal" onclick="closeModal(event)">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3 class="modal-title">Confirm Instant Borrow</h3>
+          <button class="modal-close" onclick="closeQuickBorrowModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div style="text-align: center; padding: 20px 0;">
+          <div style="font-size: 64px; margin-bottom: 16px;" id="quickBorrowIcon">🔬</div>
+          <h4 id="quickBorrowItemName" style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Equipment Name</h4>
+          <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
+            Borrowing from <strong>now</strong> until <strong>5:00 PM today</strong>
+          </p>
+          
+          <div style="background: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: left;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span style="color: var(--text-muted);">Start Time:</span>
+              <strong id="quickBorrowStart">--:--</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span style="color: var(--text-muted);">End Time:</span>
+              <strong>17:00 (5PM)</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-muted);">Duration:</span>
+              <strong id="quickBorrowDuration">-- hours</strong>
+            </div>
+          </div>
+          
+          <button class="btn-urgent" onclick="confirmQuickBorrow()">
+            <i class="fas fa-check"></i>
+            Confirm Instant Borrow
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile / Settings Modal -->
+    <div id="profileModal" class="modal" onclick="closeModal(event)">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3 class="modal-title" id="profileModalTitle">Profile</h3>
+          <button class="modal-close" onclick="closeModal(document.getElementById('profileModal'))">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div id="profileModalBody" style="padding: 0 18px 20px;"></div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast">
+      <div class="toast-icon"><i class="fas fa-check"></i></div>
+      <span id="toastMessage">Success!</span>
+    </div>
+  </div>
+
+  <script>
+    // Junior High Equipment Data
+    const equipmentData = [
+      { id: 1, name: 'Arduino Mega Kit', qty: 10, icon: '🔌', category: 'robotics', color: 'from-blue-500 to-cyan-500', description: 'Advanced microcontroller kit with sensors and modules for robotics projects.', hourlyRate: 5 },
+      { id: 2, name: 'Raspberry Pi 4', qty: 8, icon: '🍓', category: 'robotics', color: 'from-red-500 to-pink-500', description: '8GB RAM single-board computer for IoT and programming projects.', hourlyRate: 8 },
+      { id: 3, name: 'Digital Microscope', qty: 4, icon: '🔬', category: 'biotech', color: 'from-green-500 to-emerald-500', description: '1000x magnification digital microscope with camera for biology research.', hourlyRate: 15 },
+      { id: 4, name: 'Spectrometer', qty: 2, icon: '🌈', category: 'biotech', color: 'from-purple-500 to-violet-500', description: 'Professional spectrometer for chemical analysis and research.', hourlyRate: 25 },
+      { id: 5, name: '3D Printer (Resin)', qty: 3, icon: '🖨️', category: 'engineering', color: 'from-orange-500 to-amber-500', description: 'High-precision resin 3D printer for detailed prototyping.', hourlyRate: 20 },
+      { id: 6, name: 'CNC Machine', qty: 1, icon: '⚙️', category: 'engineering', color: 'from-gray-600 to-gray-800', description: 'Desktop CNC router for precision milling and manufacturing.', hourlyRate: 30 },
+      { id: 7, name: 'Oscilloscope', qty: 4, icon: '📈', category: 'engineering', color: 'from-yellow-500 to-orange-500', description: '100MHz digital oscilloscope for electronics testing.', hourlyRate: 12 },
+      { id: 8, name: 'DSLR Camera', qty: 5, icon: '📷', category: 'av', color: 'from-indigo-500 to-purple-500', description: 'Professional DSLR with lenses for photography and videography.', hourlyRate: 18 },
+      { id: 9, name: 'Drone Kit', qty: 3, icon: '🚁', category: 'robotics', color: 'from-sky-500 to-blue-600', description: 'Programmable drone with camera for aerial photography and coding.', hourlyRate: 22 },
+      { id: 10, name: 'VR Headset', qty: 6, icon: '🥽', category: 'av', color: 'from-cyan-500 to-teal-500', description: 'Virtual reality headset for immersive simulations and development.', hourlyRate: 10 },
+      { id: 11, name: 'PCR Machine', qty: 1, icon: '🧬', category: 'biotech', color: 'from-rose-500 to-pink-600', description: 'Thermal cycler for DNA amplification experiments.', hourlyRate: 35 },
+      { id: 12, name: 'Laser Cutter', qty: 1, icon: '⚡', category: 'engineering', color: 'from-red-600 to-orange-600', description: '40W laser cutter for precision cutting and engraving.', hourlyRate: 28 },
+      { id: 13, name: 'Soldering Station', qty: 8, icon: '🔥', category: 'engineering', color: 'from-orange-400 to-red-400', description: 'Professional temperature-controlled soldering station.', hourlyRate: 3 },
+      { id: 14, name: 'Bio-Reactor', qty: 2, icon: '🧪', category: 'biotech', color: 'from-emerald-500 to-green-600', description: 'Small-scale bioreactor for cell culture experiments.', hourlyRate: 40 },
+      { id: 15, name: 'Gimbal Stabilizer', qty: 4, icon: '🎥', category: 'av', color: 'from-slate-500 to-gray-600', description: '3-axis gimbal for smooth video recording.', hourlyRate: 8 },
+      { id: 16, name: 'Logic Analyzer', qty: 3, icon: '📊', category: 'engineering', color: 'from-violet-500 to-purple-600', description: '16-channel logic analyzer for digital circuit debugging.', hourlyRate: 10 }
+    ];
+
+    let currentItem = null;
+    let selectedDate = null;
+    let selectedTimeSlot = null;
+    let timeMode = 'preset';
+    let reservations = JSON.parse(localStorage.getItem('juniorReservations')) || [];
+    let currentFilter = 'all';
+    let quickBorrowItem = null;
+    let pendingAvatar = null;
+
+    function init() {
+      generateDatePicker();
+      renderDashboard();
+      renderReserveGrid();
+      updateStats();
+      startCountdownTimer();
+      setupProfileActions();
+      loadProfileUI();
+      applyTheme(loadSettings().darkMode);
+    }
+
+    function loadProfileUI() {
+      const profile = loadProfile();
+      const nameEl = document.getElementById('profileName');
+      const emailEl = document.getElementById('profileEmail');
+      const headerAvatar = document.getElementById('headerAvatar');
+      const profileAvatar = document.getElementById('profileAvatar');
+      const userNameEl = document.getElementById('userName');
+
+      if (nameEl) nameEl.textContent = profile.name;
+      if (emailEl) emailEl.textContent = profile.email;
+      if (userNameEl) userNameEl.textContent = profile.name;
+      if (headerAvatar) headerAvatar.src = profile.avatar;
+      if (profileAvatar) profileAvatar.src = profile.avatar;
+
+      pendingAvatar = profile.avatar;
+    }
+
+    function setupProfileActions() {
+      const profileActions = document.querySelectorAll('.profile-menu-item');
+      profileActions.forEach(item => {
+        item.addEventListener('click', () => {
+          const action = item.getAttribute('data-action');
+          openProfileModal(action);
+        });
+      });
+    }
+
+    function handleAvatarChange(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        pendingAvatar = reader.result;
+        const preview = document.getElementById('avatarPreview');
+        if (preview) preview.src = pendingAvatar;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function generateDatePicker() {
+      const picker = document.getElementById('datePicker');
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      
+      picker.innerHTML = '';
+      const today = new Date();
+      
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() + i);
+        
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'date-option' + (i === 0 ? ' active' : '');
+        dayDiv.innerHTML = `
+          <div class="date-day">${days[date.getDay()]}</div>
+          <div class="date-num">${date.getDate()}</div>
+          <div class="date-month">${months[date.getMonth()]}</div>
+        `;
+        dayDiv.onclick = () => selectDate(date, dayDiv);
+        picker.appendChild(dayDiv);
+      }
+      
+      selectedDate = today;
+    }
+
+    function selectDate(date, element) {
+      selectedDate = date;
+      document.querySelectorAll('.date-option').forEach(el => el.classList.remove('active'));
+      element.classList.add('active');
+      if (timeMode === 'preset') {
+        generateTimeSlots();
+      }
+    }
+
+    function setTimeMode(mode, btn) {
+      timeMode = mode;
+      document.querySelectorAll('.time-mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      if (mode === 'preset') {
+        document.getElementById('presetTimeContainer').style.display = 'block';
+        document.getElementById('customTimeContainer').style.display = 'none';
+        generateTimeSlots();
+      } else {
+        document.getElementById('presetTimeContainer').style.display = 'none';
+        document.getElementById('customTimeContainer').style.display = 'block';
+      }
+    }
+
+    function generateTimeSlots() {
+      const container = document.getElementById('timeSlots');
+      container.innerHTML = '';
+      
+      for (let hour = 8; hour < 17; hour++) {
+        const timeStr = `${hour.toString().padStart(2, '0')}:00`;
+        const nextHour = `${(hour + 1).toString().padStart(2, '0')}:00`;
+        
+        const slot = document.createElement('div');
+        slot.className = 'time-slot';
+        slot.textContent = `${timeStr}-${nextHour}`;
+        
+        const isBooked = checkIfBooked(timeStr);
+        if (isBooked) {
+          slot.classList.add('booked');
+          slot.title = 'Already reserved';
+        } else {
+          slot.onclick = () => selectTimeSlot(slot, timeStr);
+        }
+        
+        container.appendChild(slot);
+      }
+    }
+
+    function checkIfBooked(timeStr) {
+      if (!currentItem || !selectedDate) return false;
+      
+      const dateStr = selectedDate.toISOString().split('T')[0];
+      return reservations.some(r => 
+        r.itemId === currentItem.id && 
+        r.date === dateStr && 
+        r.timeSlot === timeStr &&
+        r.status !== 'cancelled'
+      );
+    }
+
+    function selectTimeSlot(element, timeStr) {
+      document.querySelectorAll('.time-slot').forEach(el => {
+        if (!el.classList.contains('booked')) el.classList.remove('selected');
+      });
+      element.classList.add('selected');
+      selectedTimeSlot = timeStr;
+    }
+
+    function validateCustomTime() {
+      const start = document.getElementById('customStartTime').value;
+      const end = document.getElementById('customEndTime').value;
+      const errorEl = document.getElementById('timeError');
+      
+      if (start >= end) {
+        errorEl.style.display = 'block';
+        return false;
+      } else {
+        errorEl.style.display = 'none';
+        return true;
+      }
+    }
+
+    function renderDashboard() {
+      const grid = document.getElementById('dashboardGrid');
+      const filtered = currentFilter === 'all' 
+        ? equipmentData.slice(0, 6) 
+        : equipmentData.filter(item => item.category === currentFilter).slice(0, 6);
+      
+      grid.innerHTML = filtered.map(item => createCardHTML(item)).join('');
+    }
+
+    function renderReserveGrid() {
+      const grid = document.getElementById('reserveGrid');
+      const filtered = currentFilter === 'all' 
+        ? equipmentData 
+        : equipmentData.filter(item => item.category === currentFilter);
+      
+      grid.innerHTML = filtered.map(item => createCardHTML(item)).join('');
+    }
+
+    function createCardHTML(item) {
+      const isReserved = checkIfItemReservedToday(item.id);
+      const statusClass = isReserved ? 'status-reserved' : (item.qty > 0 ? 'status-available' : 'status-unavailable');
+      const statusText = isReserved ? 'Reserved' : (item.qty > 0 ? 'Available' : 'Out');
+      
+      return `
+        <div class="item-card" onclick="openReservationModal(${item.id})">
+          <button class="quick-borrow-btn" onclick="event.stopPropagation(); initiateQuickBorrow(${item.id})">
+            <i class="fas fa-bolt"></i> Quick
+          </button>
+          <div class="card-image-wrapper" style="background: linear-gradient(135deg, ${getGradient(item.color)});">
+            <span class="card-badge">${item.qty} units</span>
+            <div class="card-icon">${item.icon}</div>
+          </div>
+          <div class="card-content">
+            <h4 class="card-title">${item.name}</h4>
+            <div class="card-meta">
+              <span class="card-status ${statusClass}">${statusText}</span>
+              <span class="card-qty">₱${item.hourlyRate}/hr</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function checkIfItemReservedToday(itemId) {
+      const today = new Date().toISOString().split('T')[0];
+      return reservations.some(r => 
+        r.itemId === itemId && 
+        r.date === today && 
+        r.status === 'active'
+      );
+    }
+
+    function getGradient(colorClass) {
+      const gradients = {
+        'from-blue-500 to-cyan-500': '#3b82f6, #06b6d4',
+        'from-red-500 to-pink-500': '#ef4444, #ec4899',
+        'from-green-500 to-emerald-500': '#22c55e, #10b981',
+        'from-purple-500 to-violet-500': '#8b5cf6, #7c3aed',
+        'from-orange-500 to-amber-500': '#f97316, #f59e0b',
+        'from-gray-600 to-gray-800': '#4b5563, #1f2937',
+        'from-yellow-500 to-orange-500': '#eab308, #f97316',
+        'from-indigo-500 to-purple-500': '#6366f1, #a855f7',
+        'from-sky-500 to-blue-600': '#0ea5e9, #2563eb',
+        'from-cyan-500 to-teal-500': '#06b6d4, #14b8a6',
+        'from-rose-500 to-pink-600': '#f43f5e, #db2777',
+        'from-red-600 to-orange-600': '#dc2626, #ea580c',
+        'from-orange-400 to-red-400': '#fb923c, #f87171',
+        'from-emerald-500 to-green-600': '#10b981, #16a34a',
+        'from-slate-500 to-gray-600': '#64748b, #4b5563',
+        'from-violet-500 to-purple-600': '#8b5cf6, #9333ea',
+      };
+      return gradients[colorClass] || '#667eea, #764ba2';
+    }
+
+    function filterCategory(category, btn) {
+      currentFilter = category;
+      document.querySelectorAll('.category-pill').forEach(pill => pill.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderDashboard();
+      renderReserveGrid();
+    }
+
+    function openReservationModal(itemId) {
+      const item = equipmentData.find(i => i.id === itemId);
+      if (!item || item.qty === 0) {
+        showToast('Equipment not available', 'error');
+        return;
+      }
+      
+      currentItem = item;
+      document.getElementById('modalItemName').textContent = item.name;
+      document.getElementById('modalItemDesc').textContent = item.description;
+      document.getElementById('modalItemIcon').textContent = item.icon;
+      document.getElementById('reserveQuantity').max = item.qty;
+      
+      // Reset to preset mode
+      setTimeMode('preset', document.querySelector('.time-mode-btn'));
+      generateDatePicker();
+      generateTimeSlots();
+      
+      document.getElementById('reservationModal').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeReservationModal() {
+      document.getElementById('reservationModal').classList.remove('show');
+      document.body.style.overflow = '';
+      currentItem = null;
+      selectedTimeSlot = null;
+    }
+
+    function submitReservation(e) {
+      e.preventDefault();
+      
+      let timeRange;
+      if (timeMode === 'preset') {
+        if (!selectedTimeSlot) {
+          showToast('Please select a time slot', 'error');
+          return;
+        }
+        timeRange = selectedTimeSlot;
+      } else {
+        if (!validateCustomTime()) {
+          showToast('Please fix time errors', 'error');
+          return;
+        }
+        const start = document.getElementById('customStartTime').value;
+        const end = document.getElementById('customEndTime').value;
+        timeRange = `${start}-${end}`;
+      }
+      
+      const quantity = parseInt(document.getElementById('reserveQuantity').value);
+      const purpose = document.getElementById('reservePurpose').value;
+      const notes = document.getElementById('reserveNotes').value;
+      
+      // Calculate due time (5 PM if not specified)
+      let dueDateTime = new Date(selectedDate);
+      if (timeMode === 'custom') {
+        const endTime = document.getElementById('customEndTime').value;
+        const [hours, minutes] = endTime.split(':');
+        dueDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+      } else {
+        dueDateTime.setHours(17, 0, 0, 0);
+      }
+      
+      const reservation = {
+        id: Date.now(),
+        itemId: currentItem.id,
+        itemName: currentItem.name,
+        itemIcon: currentItem.icon,
+        quantity: quantity,
+        date: selectedDate.toISOString().split('T')[0],
+        timeSlot: timeRange,
+        dueTime: dueDateTime.toISOString(),
+        purpose: purpose,
+        notes: notes,
+        status: 'active',
+        type: 'reservation',
+        createdAt: new Date().toISOString()
+      };
+      
+      reservations.unshift(reservation);
+      localStorage.setItem('juniorReservations', JSON.stringify(reservations));
+
+      // Send request to admin for approval (Transaction Pending)
+      const borrowRequests = JSON.parse(localStorage.getItem('borrowRequests')) || [];
+      const userProfile = loadProfile();
+      const request = {
+        id: Date.now(),
+        itemId: currentItem.id,
+        itemName: currentItem.name,
+        userName: userProfile.name,
+        lrn: userProfile.lrn,
+        quantity,
+        expectedReturnDate: reservation.dueTime.split('T')[0],
+        purpose,
+        userRole: 'junior',
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      };
+      borrowRequests.unshift(request);
+      localStorage.setItem('borrowRequests', JSON.stringify(borrowRequests));
+      
+      closeReservationModal();
+      showToast('Request submitted. Awaiting approval.');
+      updateStats();
+      renderReservations();
+      renderDashboard();
+      renderReserveGrid();
+      
+      document.getElementById('reservationForm').reset();
+    }
+
+    // Borrow Now Functions
+    function showBorrowNowModal() {
+      const modal = document.getElementById('borrowNowModal');
+      const grid = document.getElementById('borrowNowGrid');
+      
+      // Show only available items
+      const availableItems = equipmentData.filter(item => item.qty > 0 && !checkIfItemReservedToday(item.id));
+      
+      if (availableItems.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">😔</div>
+            <p class="empty-text">No equipment available for instant borrow</p>
+          </div>
+        `;
+      } else {
+        grid.innerHTML = availableItems.map(item => `
+          <div style="background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 16px; cursor: pointer; border: 2px solid transparent; transition: all 0.3s;" 
+               onmouseover="this.style.borderColor='var(--primary)'" 
+               onmouseout="this.style.borderColor='transparent'"
+               onclick="initiateQuickBorrow(${item.id})">
+            <div style="font-size: 40px;">${item.icon}</div>
+            <div style="flex: 1;">
+              <h4 style="font-weight: 700; margin-bottom: 4px;">${item.name}</h4>
+              <p style="font-size: 12px; color: var(--text-muted);">${item.description.substring(0, 50)}...</p>
+              <div style="margin-top: 6px; font-size: 13px; color: var(--primary); font-weight: 600;">
+                ₱${item.hourlyRate}/hr • ${item.qty} available
+              </div>
+            </div>
+            <button style="background: var(--urgent-gradient); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        `).join('');
+      }
+      
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeBorrowNowModal() {
+      document.getElementById('borrowNowModal').classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    function initiateQuickBorrow(itemId) {
+      const item = equipmentData.find(i => i.id === itemId);
+      if (!item) return;
+      
+      quickBorrowItem = item;
+      const now = new Date();
+      const endOfDay = new Date();
+      endOfDay.setHours(17, 0, 0, 0);
+      
+      const hoursLeft = Math.ceil((endOfDay - now) / (1000 * 60 * 60));
+      
+      document.getElementById('quickBorrowIcon').textContent = item.icon;
+      document.getElementById('quickBorrowItemName').textContent = item.name;
+      document.getElementById('quickBorrowStart').textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      document.getElementById('quickBorrowDuration').textContent = `${hoursLeft} hours`;
+      
+      closeBorrowNowModal();
+      document.getElementById('quickBorrowModal').classList.add('show');
+    }
+
+    function closeQuickBorrowModal() {
+      document.getElementById('quickBorrowModal').classList.remove('show');
+      document.body.style.overflow = '';
+      quickBorrowItem = null;
+    }
+
+    function confirmQuickBorrow() {
+      if (!quickBorrowItem) return;
+      
+      const now = new Date();
+      const endOfDay = new Date();
+      endOfDay.setHours(17, 0, 0, 0);
+      
+      const reservation = {
+        id: Date.now(),
+        itemId: quickBorrowItem.id,
+        itemName: quickBorrowItem.name,
+        itemIcon: quickBorrowItem.icon,
+        quantity: 1,
+        date: now.toISOString().split('T')[0],
+        timeSlot: `${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false})}-17:00`,
+        dueTime: endOfDay.toISOString(),
+        purpose: 'immediate',
+        notes: 'Borrow Now - Instant checkout',
+        status: 'active',
+        type: 'borrow_now',
+        createdAt: now.toISOString()
+      };
+      
+      reservations.unshift(reservation);
+      localStorage.setItem('juniorReservations', JSON.stringify(reservations));
+
+      // Send request to admin for approval (Transaction Pending)
+      const borrowRequests = JSON.parse(localStorage.getItem('borrowRequests')) || [];
+      const userProfile = loadProfile();
+      const request = {
+        id: Date.now(),
+        itemId: quickBorrowItem.id,
+        itemName: quickBorrowItem.name,
+        userName: userProfile.name,
+        lrn: userProfile.lrn,
+        quantity: 1,
+        expectedReturnDate: endOfDay.toISOString().split('T')[0],
+        purpose: 'immediate',
+        userRole: 'junior',
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      };
+      borrowRequests.unshift(request);
+      localStorage.setItem('borrowRequests', JSON.stringify(borrowRequests));
+
+      closeQuickBorrowModal();
+      showToast('Borrow request sent for approval.');
+      updateStats();
+      renderReservations();
+      renderDashboard();
+      renderReserveGrid();
+    }
+
+    function renderReservations() {
+      const container = document.getElementById('reservationsList');
+      const activeReservations = reservations.filter(r => r.status === 'active');
+      
+      if (activeReservations.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📅</div>
+            <p class="empty-text">No active reservations</p>
+          </div>
+        `;
+        document.getElementById('activeTimer').style.display = 'none';
+        return;
+      }
+      
+      // Show timer for most urgent
+      const now = new Date();
+      const upcoming = activeReservations.find(r => new Date(r.dueTime) > now);
+      if (upcoming) {
+        document.getElementById('activeTimer').style.display = 'block';
+      }
+      
+      container.innerHTML = activeReservations.map(res => `
+        <div class="request-card" style="${res.type === 'borrow_now' ? 'border-left-color: var(--warning); background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), white);' : ''}">
+          <div class="request-header">
+            <span class="request-item">${res.itemIcon} ${res.itemName}</span>
+            <span class="request-status status-${res.status}">${res.status}</span>
+          </div>
+          <div class="request-details">
+            <p><strong>Date:</strong> ${formatDate(res.date)} | <strong>Qty:</strong> ${res.quantity}</p>
+            <div class="time-slot-badge" style="${res.type === 'borrow_now' ? 'background: rgba(245, 158, 11, 0.1); color: var(--warning);' : ''}">
+              <i class="fas fa-clock"></i> ${res.timeSlot}
+              ${res.type === 'borrow_now' ? '<span style="margin-left: 4px; font-size: 10px;">(Borrow Now)</span>' : ''}
+            </div>
+            <p style="margin-top: 6px; color: #94a3b8; font-size: 11px;">
+              <strong>Due:</strong> ${new Date(res.dueTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+            </p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function startCountdownTimer() {
+      setInterval(() => {
+        const now = new Date();
+        const activeReservations = reservations.filter(r => r.status === 'active');
+        
+        if (activeReservations.length === 0) {
+          document.getElementById('countdown').textContent = '00:00:00';
+          return;
+        }
+        
+        const nearest = activeReservations.reduce((prev, curr) => 
+          new Date(prev.dueTime) < new Date(curr.dueTime) ? prev : curr
+        );
+        
+        const dueTime = new Date(nearest.dueTime);
+        const diff = dueTime - now;
+        
+        // Allow a 1-minute grace period (so 5:00PM -> 5:01PM is still shown as 00:00:00)
+        if (diff >= 0) {
+          const hours = Math.floor(diff / (1000 * 60 * 60));
+          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+          document.getElementById('countdown').textContent = 
+            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+          document.getElementById('countdown').style.color = 'var(--primary)';
+        } else if (diff >= -60000) {
+          // Still show 00:00:00 until 1 minute past due
+          document.getElementById('countdown').textContent = '00:00:00';
+          document.getElementById('countdown').style.color = 'var(--primary)';
+        } else {
+          document.getElementById('countdown').textContent = 'OVERDUE';
+          document.getElementById('countdown').style.color = 'var(--error)';
+        }
+      }, 1000);
+    }
+
+    function updateStats() {
+      const active = reservations.filter(r => r.status === 'active').length;
+      document.getElementById('activeCount').textContent = active;
+      
+      const badge = document.getElementById('navBadge');
+      if (active > 0) {
+        badge.textContent = active;
+        badge.style.display = 'flex';
+      } else {
+        badge.style.display = 'none';
+      }
+      
+      const totalAvailable = equipmentData.reduce((sum, item) => sum + item.qty, 0);
+      document.getElementById('availableCount').textContent = totalAvailable;
+    }
+
+    function showSection(sectionName, navItem) {
+      document.querySelectorAll('.page-section').forEach(section => {
+        section.classList.remove('active');
+      });
+      
+      document.getElementById(sectionName + 'Section').classList.add('active');
+      
+      if (navItem) {
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        navItem.classList.add('active');
+      }
+      
+      if (sectionName === 'reservations') renderReservations();
+      if (sectionName === 'history') renderHistory();
+      if (sectionName === 'profile') loadProfileUI();
+      
+      document.querySelector('.content').scrollTop = 0;
+    }
+
+    function renderHistory() {
+      const completed = reservations.filter(r => r.status === 'completed' || r.status === 'cancelled');
+      const container = document.getElementById('historyList');
+      
+      if (completed.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📚</div>
+            <p class="empty-text">No reservation history</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = completed.map(res => `
+        <div class="request-card" style="border-left-color: ${res.status === 'completed' ? '#10b981' : '#ef4444'};">
+          <div class="request-header">
+            <span class="request-item">${res.itemIcon} ${res.itemName}</span>
+            <span class="request-status status-${res.status}">${res.status}</span>
+          </div>
+          <div class="request-details">
+            <p><strong>Date:</strong> ${formatDate(res.date)} | <strong>Qty:</strong> ${res.quantity}</p>
+            <div class="time-slot-badge">
+              <i class="fas fa-clock"></i> ${res.timeSlot}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      const toastIcon = toast.querySelector('.toast-icon');
+      
+      toastMessage.textContent = message;
+      
+      if (type === 'error') {
+        toastIcon.style.background = '#ef4444';
+        toastIcon.innerHTML = '<i class="fas fa-exclamation"></i>';
+      } else if (type === 'info') {
+        toastIcon.style.background = '#3b82f6';
+        toastIcon.innerHTML = '<i class="fas fa-info-circle"></i>';
+      } else {
+        toastIcon.style.background = '#10b981';
+        toastIcon.innerHTML = '<i class="fas fa-check"></i>';
+      }
+      
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    function closeModal(eventOrElement) {
+      // Accept either an event (from overlay click) or a modal element directly.
+      let modal = null;
+      if (eventOrElement && eventOrElement.currentTarget && eventOrElement.target) {
+        // Event passed from overlay click
+        if (eventOrElement.target !== eventOrElement.currentTarget) return;
+        modal = eventOrElement.currentTarget;
+      } else if (eventOrElement instanceof HTMLElement) {
+        modal = eventOrElement;
+      }
+      if (!modal) return;
+      modal.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    function openProfileModal(action) {
+      const modal = document.getElementById('profileModal');
+      const title = document.getElementById('profileModalTitle');
+      const body = document.getElementById('profileModalBody');
+      const profile = loadProfile();
+
+      function setContent(html) {
+        body.innerHTML = html;
+      }
+
+      switch (action) {
+        case 'edit':
+          title.textContent = 'Edit Profile';
+          pendingAvatar = profile.avatar;
+          setContent(`
+            <div style="margin-top: 10px; display: flex; align-items: center; gap: 12px;">
+              <div style="width: 64px; height: 64px; border-radius: 18px; overflow: hidden; border: 2px solid rgba(99,102,241,0.2);">
+                <img id="avatarPreview" src="${profile.avatar}" alt="Avatar" class="w-full h-full object-cover" />
+              </div>
+              <label style="cursor: pointer; font-weight: 600; color: var(--primary);">
+                Change
+                <input id="profileAvatarInput" type="file" accept="image/*" style="display: none;" onchange="handleAvatarChange(event)" />
+              </label>
+            </div>
+            <div style="margin-top: 12px;">
+              <label class="form-label">LRN (Student ID)</label>
+              <input id="profileLrnInput" class="form-input" value="${profile.lrn}" disabled style="background: #f1f5f9; color: #888; cursor: not-allowed;" />
+              <p style="font-size: 11px; color: #888; margin-top: 4px;">Your LRN cannot be changed</p>
+            </div>
+            <div style="margin-top: 12px;">
+              <label class="form-label">Full Name</label>
+              <input id="profileNameInput" class="form-input" value="${profile.name}" />
+            </div>
+            <div style="margin-top: 12px;">
+              <label class="form-label">Email</label>
+              <input id="profileEmailInput" class="form-input" value="${profile.email}" />
+            </div>
+            <button class="btn-primary" onclick="saveProfile()">Save Changes</button>
+          `);
+          break;
+        case 'notifications':
+          title.textContent = 'Notification Settings';
+          const notif = loadNotificationSettings();
+          setContent(`
+            <div style="margin-top: 10px; display: grid; gap: 12px;">
+              <label class="toggle">
+                <span>Request status updates</span>
+                <input id="notifRequestStatus" type="checkbox" ${notif.requestStatus ? 'checked' : ''} />
+                <span class="toggle-slider"></span>
+              </label>
+              <label class="toggle">
+                <span>Approvals & rejections</span>
+                <input id="notifApproval" type="checkbox" ${notif.approval ? 'checked' : ''} />
+                <span class="toggle-slider"></span>
+              </label>
+              <label class="toggle">
+                <span>Announcements</span>
+                <input id="notifAnnouncements" type="checkbox" ${notif.announcements ? 'checked' : ''} />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <button class="btn-primary" onclick="saveNotificationSettings()">Save</button>
+          `);
+          break;
+        case 'security':
+          title.textContent = 'Security';
+          setContent(`
+            <div style="margin-top: 10px;">
+              <label class="form-label">Current Password</label>
+              <input id="securityCurrent" class="form-input" type="password" placeholder="••••••••" />
+            </div>
+            <div style="margin-top: 12px;">
+              <label class="form-label">New Password</label>
+              <input id="securityNew" class="form-input" type="password" placeholder="••••••••" />
+            </div>
+            <div style="margin-top: 12px;">
+              <label class="form-label">Confirm Password</label>
+              <input id="securityConfirm" class="form-input" type="password" placeholder="••••••••" />
+            </div>
+            <button class="btn-primary" onclick="saveSecuritySettings()">Update Password</button>
+          `);
+          break;
+        case 'settings':
+          title.textContent = 'Settings';
+          const settings = loadSettings();
+          setContent(`
+            <div style="margin-top: 10px; display: grid; gap: 12px;">
+              <label class="toggle">
+                <span>Dark Mode</span>
+                <input id="settingDarkMode" type="checkbox" ${settings.darkMode ? 'checked' : ''} />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <button class="btn-primary" onclick="saveSettings()">Save</button>
+          `);
+          break;
+        case 'logout':
+          title.textContent = 'Logout';
+          setContent(`
+            <p style="color: var(--text-muted); margin-bottom: 18px;">Are you sure you want to logout?</p>
+            <div style="display: flex; gap: 12px;">
+              <button class="btn-secondary" onclick="closeModal(document.getElementById('profileModal'))">Cancel</button>
+              <button class="btn-urgent" onclick="performLogout()">Logout</button>
+            </div>
+          `);
+          break;
+        default:
+          title.textContent = 'Coming Soon';
+          setContent('<p style="margin-top: 14px; color: var(--text-muted);">This feature is coming soon.</p>');
+      }
+
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function getCurrentUser() {
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      return currentUser;
+    }
+
+    function loadProfile() {
+      const currentUser = getCurrentUser();
+      const stored = JSON.parse(localStorage.getItem('juniorProfile') || '{}');
+      return {
+        name: stored.name || currentUser.fullName || 'Hasibur Rahman',
+        email: stored.email || currentUser.email || 'hasib@example.com',
+        lrn: currentUser.lrn || 'JUNIOR-001',
+        avatar: stored.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop'
+      };
+    }
+
+    function saveProfile() {
+      const name = document.getElementById('profileNameInput')?.value.trim();
+      const email = document.getElementById('profileEmailInput')?.value.trim();
+      if (!name || !email) {
+        showToast('Please provide name and email', 'error');
+        return;
+      }
+      const profile = {
+        name,
+        email,
+        avatar: pendingAvatar || loadProfile().avatar
+      };
+      localStorage.setItem('juniorProfile', JSON.stringify(profile));
+      
+      // Also update currentUser with the new name
+      const currentUser = getCurrentUser();
+      currentUser.fullName = name;
+      currentUser.email = email;
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      
+      document.getElementById('profileName').textContent = name;
+      document.getElementById('profileEmail').textContent = email;
+      document.getElementById('userName').textContent = name;
+      const headerAvatar = document.getElementById('headerAvatar');
+      const profileAvatar = document.getElementById('profileAvatar');
+      if (headerAvatar) headerAvatar.src = profile.avatar;
+      if (profileAvatar) profileAvatar.src = profile.avatar;
+      showToast('Profile updated');
+      closeModal(document.getElementById('profileModal'));
+    }
+
+    function loadNotificationSettings() {
+      const stored = JSON.parse(localStorage.getItem('juniorNotifications') || '{}');
+      return {
+        requestStatus: stored.requestStatus ?? true,
+        approval: stored.approval ?? true,
+        announcements: stored.announcements ?? false
+      };
+    }
+
+    function saveNotificationSettings() {
+      const settings = {
+        requestStatus: document.getElementById('notifRequestStatus').checked,
+        approval: document.getElementById('notifApproval').checked,
+        announcements: document.getElementById('notifAnnouncements').checked
+      };
+      localStorage.setItem('juniorNotifications', JSON.stringify(settings));
+      showToast('Notification settings saved');
+      closeModal(document.getElementById('profileModal'));
+    }
+
+    function loadSettings() {
+      const stored = JSON.parse(localStorage.getItem('juniorSettings') || '{}');
+      return {
+        darkMode: stored.darkMode ?? false
+      };
+    }
+
+    function saveSettings() {
+      const settings = {
+        darkMode: document.getElementById('settingDarkMode').checked
+      };
+      localStorage.setItem('juniorSettings', JSON.stringify(settings));
+      applyTheme(settings.darkMode);
+      showToast('Settings saved');
+      closeModal(document.getElementById('profileModal'));
+    }
+
+    function applyTheme(dark) {
+      document.body.style.background = dark ? '#0b1220' : 'var(--junior-gradient)';
+    }
+
+    function saveSecuritySettings() {
+      const current = document.getElementById('securityCurrent').value;
+      const next = document.getElementById('securityNew').value;
+      const confirm = document.getElementById('securityConfirm').value;
+      if (!current || !next) {
+        showToast('Please fill out passwords', 'error');
+        return;
+      }
+      if (next !== confirm) {
+        showToast('Passwords do not match', 'error');
+        return;
+      }
+      // In a real app, you'd verify current password and update it securely.
+      showToast('Password updated');
+      closeModal(document.getElementById('profileModal'));
+    }
+
+    function performLogout() {
+      // Logout: clear all stored data and redirect to student login
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('juniorProfile');
+      localStorage.removeItem('juniorNotifications');
+      localStorage.removeItem('juniorSettings');
+      localStorage.removeItem('juniorReservations');
+      showToast('Logged out successfully', 'info');
+      closeModal(document.getElementById('profileModal'));
+      setTimeout(() => {
+        window.location.href = 'student login.html';
+      }, 500);
+    }
+
+    function toggleMenu() {
+      showToast('Menu coming soon!', 'info');
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>   

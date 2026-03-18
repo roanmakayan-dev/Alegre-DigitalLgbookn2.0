@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up | Digital Logbook</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- html2canvas for saving as image -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- EmailJS for sending emails -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: url('/assets/mouse.png.jpg') center/cover no-repeat fixed;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .auth-wrapper {
+      display: flex;
+      width: 100%;
+      max-width: 1000px;
+      height: 650px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    /* LEFT PANEL - DARK BRANDING */
+    .auth-left {
+      width: 35%;
+      background: linear-gradient(135deg, #1a3a4a 0%, #0d2536 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      text-align: center;
+      padding: 40px 30px;
+      position: relative;
+    }
+
+    .auth-left::before {
+      content: '';
+      position: absolute;
+      width: 250px;
+      height: 250px;
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      top: -70px;
+      left: -50px;
+      opacity: 0.3;
+    }
+
+    .auth-left::after {
+      content: '';
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      bottom: -60px;
+      right: -40px;
+      opacity: 0.3;
+    }
+
+    .auth-left-content {
+      position: relative;
+      z-index: 2;
+      margin-top: -150px;
+    }
+
+    .auth-left h2 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      letter-spacing: 1px;
+    }
+
+    .auth-left p {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.85);
+      line-height: 1.8;
+    }
+
+    /* RIGHT PANEL - FORM */
+    .auth-right {
+      width: 65%;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      padding: 50px 45px;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 25px;
+      font-size: 28px;
+      color: #d1d5db;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .close-btn:hover {
+      color: #6b7280;
+    }
+
+    .auth-header {
+      margin-bottom: 35px;
+    }
+
+    .auth-header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 5px;
+    }
+
+    .form-group {
+      margin-bottom: 22px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      color: #4b5563;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+
+    .form-group label.required::after {
+      content: ' *';
+      color: #ef4444;
+      margin-left: 6px;
+      font-weight: 700;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.3s ease;
+      background: #ffffff;
+      color: #1f2937;
+    }
+
+    .form-group input::placeholder {
+      color: #9ca3af;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #a78bfa;
+      box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 25px 0;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: #a78bfa;
+    }
+
+    .checkbox-group label {
+      margin: 0;
+      font-size: 13px;
+      cursor: pointer;
+      color: #6b7280;
+      font-weight: 400;
+    }
+
+    .error-msg {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 12px 14px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      display: none;
+      font-size: 13px;
+      border-left: 4px solid #dc2626;
+    }
+
+    .error-msg.show {
+      display: block;
+    }
+
+    .success-msg {
+      background: #dcfce7;
+      color: #166534;
+      padding: 12px 14px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      display: none;
+      font-size: 13px;
+      border-left: 4px solid #22c55e;
+    }
+
+    .success-msg.show {
+      display: block;
+    }
+
+    .auth-btn {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #a78bfa 0%, #9333ea 100%);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 20px 0;
+    }
+
+    .auth-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(167, 139, 250, 0.4);
+    }
+
+    .auth-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .auth-btn.secondary {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      margin-top: 10px;
+    }
+
+    .auth-btn.success {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    }
+
+    .auth-link {
+      text-align: center;
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 15px;
+    }
+
+    .auth-link a {
+      color: #7c3aed;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .auth-link a:hover {
+      text-decoration: underline;
+    }
+
+    .terms {
+      text-align: center;
+      font-size: 11px;
+      color: #9ca3af;
+      line-height: 1.6;
+    }
+
+    .terms a {
+      color: #7c3aed;
+      text-decoration: none;
+    }
+
+    /* SUCCESS CARD STYLES */
+    .success-card {
+      display: none;
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      border: 2px solid #22c55e;
+      border-radius: 12px;
+      padding: 30px;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .success-card.show {
+      display: block;
+    }
+
+    .success-icon {
+      font-size: 60px;
+      color: #22c55e;
+      margin-bottom: 15px;
+    }
+
+    .success-card h2 {
+      color: #166534;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .account-details {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      text-align: left;
+      border: 1px solid #e5e7eb;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      font-weight: 600;
+      color: #6b7280;
+      font-size: 13px;
+    }
+
+    .detail-value {
+      font-weight: 600;
+      color: #1f2937;
+      font-size: 13px;
+    }
+
+    .code-highlight {
+      font-size: 28px;
+      font-weight: 700;
+      color: #7c3aed;
+      font-family: monospace;
+      letter-spacing: 2px;
+      background: #f3f4f6;
+      padding: 10px 20px;
+      border-radius: 6px;
+      display: inline-block;
+      margin: 10px 0;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .action-buttons .auth-btn {
+      flex: 1;
+      min-width: 150px;
+      margin: 5px;
+    }
+
+    /* QR CODE DISPLAY */
+    .qr-container {
+      display: none;
+      text-align: center;
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 2px solid #e5e7eb;
+    }
+
+    .qr-container.show {
+      display: block;
+    }
+
+    .qr-container h3 {
+      font-size: 16px;
+      color: #1f2937;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    #qrcode {
+      display: inline-block;
+      padding: 15px;
+      background: #f9fafb;
+      border-radius: 8px;
+      border: 2px solid #e5e7eb;
+    }
+
+    .qr-note {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 12px;
+    }
+
+    .email-status {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      display: none;
+    }
+
+    .email-status.show {
+      display: block;
+    }
+
+    .email-status.sending {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .email-status.sent {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .email-status.error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    @media (max-width: 1024px) {
+      .auth-wrapper {
+        flex-direction: column;
+        height: auto;
+        max-height: none;
+      }
+
+      .auth-left,
+      .auth-right {
+        width: 100%;
+      }
+
+      .auth-left {
+        padding: 40px 30px;
+        min-height: 200px;
+      }
+
+      .auth-right {
+        padding: 40px 30px;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .auth-right {
+        padding: 25px 20px;
+      }
+
+      .auth-header h1 {
+        font-size: 20px;
+      }
+
+      .form-group {
+        margin-bottom: 16px;
+      }
+
+      .action-buttons .auth-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="auth-wrapper">
+    <!-- LEFT PANEL -->
+    <div class="auth-left">
+      <div class="auth-left-content">
+        <div style="margin-bottom:25px;">
+          <img src="assets/logo.png" alt="Logo"
+            style="width:120px; height:120px; border-radius:50%; border:3px solid rgba(255,255,255,0.2);">
+        </div>
+        <h2>Digital Logbook</h2>
+        <p>Welcome to Digital Logbook<br>Equipment Management System</p>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="auth-right">
+      <div class="auth-header">
+        <h1>Create your account</h1>
+      </div>
+
+      <div class="error-msg" id="signupError"></div>
+      <div class="success-msg" id="signupSuccess"></div>
+
+      <!-- SIGNUP FORM -->
+      <form id="signupForm" onsubmit="handleSignup(event)">
+        <div class="form-group">
+          <label for="signupLRN" class="required">LRN / Student ID</label>
+          <input type="text" id="signupLRN" name="signupLRN" required placeholder="Enter your LRN" inputmode="numeric" pattern="\d{11,12}" minlength="11" maxlength="12" title="LRN must be 11 or 12 digits">
+        </div>
+
+        <div class="form-group">
+          <label for="signupFullName" class="required">Full Name</label>
+          <input type="text" id="signupFullName" name="signupFullName" required placeholder="Enter your full name">
+        </div>
+
+        <div class="form-group">
+          <label for="signupRole" class="required">Role</label>
+          <select id="signupRole" name="signupRole" required>
+            <option value="">Select your role</option>
+            <option value="junior">Junior High</option>
+            <option value="senior">Senior High</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="signupEmail" class="required">Your email address</label>
+          <input type="email" id="signupEmail" name="signupEmail" required placeholder="Enter your email address">
+        </div>
+
+        <div class="form-group">
+          <label for="signupPassword" class="required">Create new password</label>
+          <input type="password" id="signupPassword" name="signupPassword" required placeholder="Create a password">
+        </div>
+
+        <div class="form-group">
+          <label for="signupConfirmPassword" class="required">Confirm new password</label>
+          <input type="password" id="signupConfirmPassword" name="signupConfirmPassword" required placeholder="Re-enter your password">
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="rememberMe" name="rememberMe">
+          <label for="rememberMe">Remember me</label>
+        </div>
+
+        <button type="submit" class="auth-btn">
+          Create new
+        </button>
+      </form>
+
+      <!-- SUCCESS CARD (Hidden by default) -->
+      <div class="success-card" id="successCard">
+        <div class="success-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h2>Account Created Successfully!</h2>
+        
+        <div class="account-details" id="captureArea">
+          <div style="text-align: center; margin-bottom: 15px;">
+            <img src="assets/logo.png" alt="Logo" style="width: 60px; height: 60px; border-radius: 50%;">
+            <h3 style="color: #1f2937; margin-top: 10px; font-size: 16px;">Digital Logbook</h3>
+          </div>
+          
+          <div class="detail-row">
+            <span class="detail-label">Account Code:</span>
+            <span class="detail-value code-highlight" id="displayCode">--------</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Full Name:</span>
+            <span class="detail-value" id="displayName">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">LRN:</span>
+            <span class="detail-value" id="displayLRN">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Email:</span>
+            <span class="detail-value" id="displayEmail">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Role:</span>
+            <span class="detail-value" id="displayRole">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Date Created:</span>
+            <span class="detail-value" id="displayDate">-</span>
+          </div>
+          
+          <div class="qr-container show" style="margin-top: 20px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+            <h3 style="font-size: 14px; margin-bottom: 10px;">Your QR Code</h3>
+            <div id="qrcode"></div>
+            <p class="qr-note">Scan this QR code to fill your profile information</p>
+          </div>
+        </div>
+
+        <div class="email-status" id="emailStatus"></div>
+
+        <div class="action-buttons">
+          <button class="auth-btn secondary" onclick="saveAsImage()">
+            <i class="fas fa-download"></i> Save as Image
+          </button>
+          <button class="auth-btn success" onclick="sendToEmail()">
+            <i class="fas fa-envelope"></i> Send to Email
+          </button>
+          <button class="auth-btn" onclick="continueToLogin()">
+            <i class="fas fa-arrow-right"></i> Continue to Login
+          </button>
+        </div>
+      </div>
+
+      <p class="auth-link" id="authLink">
+        Already have an account? <a href="student login.html">Log In</a>
+      </p>
+
+      <p class="terms" id="termsText">
+        By clicking Sign-up you agree to the <a href="#">Terms & Privacy Policy</a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    let isSubmitting = false;
+    let currentUserData = null;
+    let generatedCode = '';
+
+    // Initialize EmailJS (replace with your actual public key)
+    emailjs.init("YOUR_PUBLIC_KEY");
+
+    // Generate random code
+    function generateCode() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let code = '';
+      for (let i = 0; i < 8; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return code;
+    }
+
+    function handleSignup(event) {
+      event.preventDefault();
+
+      if (isSubmitting) return;
+      isSubmitting = true;
+
+      const lrn = document.getElementById('signupLRN').value.trim();
+      const fullName = document.getElementById('signupFullName').value.trim();
+      const role = document.getElementById('signupRole').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      const password = document.getElementById('signupPassword').value;
+      const confirmPassword = document.getElementById('signupConfirmPassword').value;
+
+      clearAllMessages();
+
+      if (!lrn || !fullName || !role || !email || !password || !confirmPassword) {
+        showError('signupError', 'All fields are required.');
+        isSubmitting = false;
+        return;
+      }
+
+      // Validate LRN: must be digits only and length 11 or 12
+      if (!/^\d{11,12}$/.test(lrn)) {
+        showError('signupError', 'Ang LRN ay dapat 11 o 12 digits lamang.');
+        isSubmitting = false;
+        return;
+      }
+
+      if (password.length < 6) {
+        showError('signupError', 'Password must be at least 6 characters long.');
+        isSubmitting = false;
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showError('signupError', 'Passwords do not match.');
+        isSubmitting = false;
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+
+      if (users.find(u => u.email && u.email.toLowerCase() === email.toLowerCase())) {
+        showError('signupError', 'This email is already registered. Please login instead.');
+        isSubmitting = false;
+        return;
+      }
+
+      // Generate unique code
+      generatedCode = generateCode();
+
+      // Store user data
+      currentUserData = {
+        lrn: lrn,
+        fullName: fullName,
+        email: email,
+        password: password,
+        role: role,
+        code: generatedCode,
+        createdAt: new Date().toISOString()
+      };
+
+      users.push(currentUserData);
+      localStorage.setItem('users', JSON.stringify(users));
+
+      // Also add to student records
+      const studentRecords = JSON.parse(localStorage.getItem('studentRecords')) || [];
+      const today = new Date().toISOString().split('T')[0];
+      studentRecords.push({
+        id: 'STU-' + Date.now(),
+        lrn: lrn,
+        name: fullName,
+        email: email,
+        role: role,
+        dateCreated: today
+      });
+      localStorage.setItem('studentRecords', JSON.stringify(studentRecords));
+      localStorage.setItem('currentUser', JSON.stringify({
+        lrn: lrn,
+        fullName: fullName,
+        email: email,
+        role: role,
+        code: generatedCode
+      }));
+
+      const submitBtn = event.target.querySelector('button[type="submit"]');
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+      submitBtn.disabled = true;
+
+      showSuccess('signupSuccess', '<i class="fas fa-check-circle"></i> Account created successfully!');
+
+      // Hide form elements
+      document.getElementById('signupForm').style.display = 'none';
+      document.getElementById('authLink').style.display = 'none';
+      document.getElementById('termsText').style.display = 'none';
+      document.querySelector('.auth-header').style.display = 'none';
+
+      // Show success card with details
+      setTimeout(() => {
+        displaySuccessCard();
+      }, 500);
+    }
+
+    function displaySuccessCard() {
+      const today = new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      document.getElementById('displayCode').textContent = generatedCode;
+      document.getElementById('displayName').textContent = currentUserData.fullName;
+      document.getElementById('displayLRN').textContent = currentUserData.lrn;
+      document.getElementById('displayEmail').textContent = currentUserData.email;
+      document.getElementById('displayRole').textContent = currentUserData.role === 'junior' ? 'Junior High' : 'Senior High';
+      document.getElementById('displayDate').textContent = today;
+
+      // Generate QR Code
+      const qrData = JSON.stringify({
+        lrn: currentUserData.lrn,
+        fullName: currentUserData.fullName,
+        email: currentUserData.email,
+        code: generatedCode
+      });
+
+      document.getElementById('qrcode').innerHTML = '';
+      new QRCode(document.getElementById('qrcode'), {
+        text: qrData,
+        width: 150,
+        height: 150,
+        colorDark: '#a78bfa',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      document.getElementById('successCard').classList.add('show');
+    }
+
+    // Save as Image function
+    function saveAsImage() {
+      const captureArea = document.getElementById('captureArea');
+      const emailStatus = document.getElementById('emailStatus');
+      
+      emailStatus.className = 'email-status sending show';
+      emailStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating image...';
+
+      html2canvas(captureArea, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        logging: false
+      }).then(canvas => {
+        // Convert to image and download
+        const link = document.createElement('a');
+        link.download = `DigitalLogbook_Account_${currentUserData.lrn}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+
+        emailStatus.className = 'email-status sent show';
+        emailStatus.innerHTML = '<i class="fas fa-check"></i> Image saved successfully!';
+        
+        setTimeout(() => {
+          emailStatus.classList.remove('show');
+        }, 3000);
+      }).catch(err => {
+        console.error('Error generating image:', err);
+        emailStatus.className = 'email-status error show';
+        emailStatus.innerHTML = '<i class="fas fa-exclamation-circle"></i> Failed to save image. Please try again.';
+      });
+    }
+
+    // Send to Email function
+    function sendToEmail() {
+      const emailStatus = document.getElementById('emailStatus');
+      
+      emailStatus.className = 'email-status sending show';
+      emailStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending email...';
+
+      // Prepare email parameters
+      const templateParams = {
+        to_email: currentUserData.email,
+        to_name: currentUserData.fullName,
+        account_code: generatedCode,
+        lrn: currentUserData.lrn,
+        role: currentUserData.role === 'junior' ? 'Junior High' : 'Senior High',
+        date_created: new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      };
+
+      // Send email using EmailJS
+      // NOTE: You need to set up your EmailJS account and replace the service_id and template_id
+      emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+        .then(function(response) {
+          emailStatus.className = 'email-status sent show';
+          emailStatus.innerHTML = '<i class="fas fa-check"></i> Email sent successfully! Please check your inbox.';
+          
+          setTimeout(() => {
+            emailStatus.classList.remove('show');
+          }, 5000);
+        }, function(error) {
+          console.error('Email failed:', error);
+          emailStatus.className = 'email-status error show';
+          emailStatus.innerHTML = '<i class="fas fa-exclamation-circle"></i> Failed to send email. Please save the image instead or check your email address.';
+        });
+    }
+
+    // Alternative email sending using mailto (fallback)
+    function sendEmailFallback() {
+      const subject = encodeURIComponent('Your Digital Logbook Account Details');
+      const body = encodeURIComponent(`
+Digital Logbook - Account Registration Successful!
+
+Account Code: ${generatedCode}
+Full Name: ${currentUserData.fullName}
+LRN: ${currentUserData.lrn}
+Email: ${currentUserData.email}
+Role: ${currentUserData.role === 'junior' ? 'Junior High' : 'Senior High'}
+Date Created: ${new Date().toLocaleDateString()}
+
+Please keep this information secure. You will need your Account Code to log in.
+
+Best regards,
+Digital Logbook Team
+      `);
+      
+      window.location.href = `mailto:${currentUserData.email}?subject=${subject}&body=${body}`;
+    }
+
+    function continueToLogin() {
+      window.location.href = 'student login.html';
+    }
+
+    function showError(elementId, message) {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + message;
+        element.classList.add('show');
+      }
+    }
+
+    function showSuccess(elementId, message) {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.innerHTML = message;
+        element.classList.add('show');
+      }
+    }
+
+    function clearAllMessages() {
+      const errors = document.querySelectorAll('.error-msg');
+      const successes = document.querySelectorAll('.success-msg');
+      errors.forEach(e => e.classList.remove('show'));
+      successes.forEach(s => s.classList.remove('show'));
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const currentUser = localStorage.getItem('currentUser');
+      if (currentUser) {
+        document.querySelector('.auth-right').innerHTML = `
+          <div style="text-align:center;padding:60px 20px;">
+            <h2 style="color:#7c3aed;margin-bottom:18px;">You are already signed in.</h2>
+            <p style="color:#444;margin-bottom:30px;">Log out first to create a new account.</p>
+            <a href="student login.html" style="display:inline-block;padding:12px 28px;background:#7c3aed;color:#fff;border-radius:6px;text-decoration:none;font-weight:600;">Go to Login</a>
+          </div>
+        `;
+        return;
+      }
+
+      const signupForm = document.getElementById('signupForm');
+      if (signupForm) {
+        signupForm.reset();
+      }
+    });
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Digital Logbook - Equipment Inventory</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/dcp.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+  </head>
+
+  <body>
+      <!-- Borrow Items Section -->
+      <div id="borrowSection" style="display: block; margin-top: 32px;">
+        <div class="section-title">Available Equipment</div>
+        <div class="items-grid" id="borrowEquipmentList"></div>
+      </div>
+
+      <!-- Borrow Modal -->
+      <div id="borrowModal" class="modal">
+        <div class="modal-content">
+          <h3>Borrow Equipment</h3>
+          <form id="borrowForm">
+            <div class="form-group">
+              <label>Equipment Name</label>
+              <input type="text" id="borrowItemName" readonly>
+            </div>
+            <div class="form-group">
+              <label>Quantity</label>
+              <input type="number" id="borrowQuantity" min="1" value="1" required>
+            </div>
+            <div class="form-group">
+              <label>Expected Return Date</label>
+              <input type="date" id="returnDate" required>
+            </div>
+            <div class="form-group">
+              <label>Purpose (optional)</label>
+              <textarea id="borrowPurpose" placeholder="State the purpose of borrowing..."></textarea>
+            </div>
+            <div class="modal-actions">
+              <button type="button" class="btn-cancel" onclick="closeBorrowModal()">Cancel</button>
+              <button type="submit" class="btn-submit">Confirm Borrow</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    <div class="background-container">
+      <!-- TOP NAVBAR -->
+      <nav class="top-navbar">
+        <div class="nav-container">
+          <div class="nav-left">
+            <div class="admin-info">
+              <img src="assets/logo.png" alt="Logo" />
+            </div>
+            <h2 class="nav-title">ADMIN DIGITAL LOGBOOK</h2>
+          </div>
+
+          <ul class="nav-menu">
+            <li>
+              <a href="dashboard.html">
+                <i class="fa-solid fa-chart-simple"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="student_records.html">
+                <i class="fa-solid fa-users"></i>
+                <span>Student Records</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="dcp.html" class="active">
+                <i class="fa-solid fa-laptop"></i>
+                <span>DCP Package</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="transaction.html">
+                <i class="fa-solid fa-folder"></i>
+                <span>Transaction</span>
+              </a>
+            </li>
+          </ul>
+          <div class="nav-controls">
+            <!-- Admin Profile Dropdown -->
+            <div class="admin-profile-container">
+              <button
+                class="admin-profile-btn"
+                onclick="toggleProfileDropdown()"
+                title="Admin Profile"
+              >
+                <i
+                  class="fa-solid fa-user admin-avatar-icon"
+                  aria-hidden="true"
+                ></i>
+              </button>
+              <div class="profile-dropdown" id="profileDropdown">
+                <div class="profile-header">
+                  <i
+                    class="fa-solid fa-circle-user profile-avatar-icon"
+                    aria-hidden="true"
+                  ></i>
+                  <div class="profile-info">
+                    <h3 id="profileUsername">Administrator</h3>
+                    <p id="profileEmail">admin@logbook.com</p>
+                  </div>
+                </div>
+                <div class="profile-divider"></div>
+                <button class="profile-menu-item" onclick="showEditProfile()">
+                  <i class="fa-solid fa-user-pen"></i>
+                  <span>Profile</span>
+                </button>
+                <button
+                  class="profile-menu-item"
+                  onclick="window.location.href = 'notifications.html'"
+                >
+                  <i class="fa-solid fa-bell"></i>
+                  <span>Notifications</span>
+                </button>
+                <button
+                  class="profile-menu-item"
+                  onclick="window.location.href = 'settings.html'"
+                >
+                  <i class="fa-solid fa-gear"></i>
+                  <span>Settings</span>
+                </button>
+                <button class="profile-menu-item" onclick="logout()">
+                  <i class="fa-solid fa-sign-out-alt"></i>
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- MAIN CONTENT -->
+      <div class="main-content">
+        <div class="content">
+          <div class="inventory-container">
+            <!-- Search and Filter Bar -->
+            <div class="search-container">
+              <input
+                type="text"
+                class="search-input"
+                id="searchInput"
+                placeholder="Search Product..."
+              />
+              <button class="add-new-btn" onclick="openAddItemModal()">
+                <i class="fa-solid fa-plus"></i> Add New Items
+              </button>
+              <div class="select-menu">
+                <button id="selectMenuBtn" onclick="toggleSelectMenu()" style="background:none;border:none;cursor:pointer;padding:0 10px;">
+                  <span style="font-size:24px;vertical-align:middle;">&#8226;&#8226;</span>
+                </button>
+                <div id="selectMenuDropdown" class="select-dropdown" style="display:none;position:absolute;z-index:10;background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.15);padding:8px 0;">
+                  <button onclick="enableSelectMode()" style="background:none;border:none;padding:8px 16px;width:100%;text-align:left;cursor:pointer;">Select Items</button>
+                  <button onclick="selectAllItems()" style="background:none;border:none;padding:8px 16px;width:100%;text-align:left;cursor:pointer;">Select All</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Items Grid -->
+            <div class="items-grid" id="itemsGrid">
+              <!-- Items will be populated here by JavaScript -->
+            </div>
+            <div id="selectActionsBar" style="display:none;margin:16px 0;text-align:center;">
+              <button onclick="removeSelectedItems()" style="background:#e74c3c;color:#fff;padding:8px 24px;border:none;border-radius:6px;margin-right:12px;font-weight:bold;">Remove Selected</button>
+              <button onclick="disableSelectMode()" style="background:#10b981;color:#fff;padding:8px 24px;border:none;border-radius:6px;font-weight:bold;">Done</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Item Modal -->
+    <div class="modal" id="addItemModal" style="display: none">
+      <div class="modal-content">
+        <h2>Add New Item</h2>
+        <label>Item Name</label>
+        <input type="text" id="newItemName" placeholder="Enter item name" />
+
+        <label>Available Quantity</label>
+        <input
+          type="number"
+          id="newItemAvailable"
+          placeholder="Enter quantity"
+          min="0"
+          value="1"
+        />        
+
+
+        <label>For</label>
+        <select id="newItemFor">
+          <option value="junior">Junior</option>
+          <option value="senior">Senior</option>
+          <option value="both">Both</option>
+        </select>
+
+        <label>Upload Image</label>
+        <input type="file" id="newItemImage" accept="image/*" />
+        <div id="imagePreview" style="margin-top: 10px"></div>
+
+        <div class="buttons">
+          <button class="cancel-btn" onclick="closeAddItemModal()">
+            Cancel
+          </button>
+          <button class="add-btn" onclick="saveNewItem()">Add Item</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Item Modal -->
+    <div class="modal" id="editItemModal" style="display: none">
+      <div class="modal-content">
+        <h2>Edit Item</h2>
+        <label>Item Name</label>
+        <input type="text" id="editItemName" placeholder="Enter item name" />
+
+        <label>Category</label>
+        <select id="editItemCategory">
+          <option value="electronics">Electronics</option>
+          <option value="accessories">Accessories</option>
+          <option value="furniture">Furniture</option>
+        </select>
+
+        <label>Available Quantity</label>
+        <input
+          type="number"
+          id="editItemAvailable"
+          placeholder="Enter quantity"
+          min="0"
+          value="1"
+        />
+
+
+        <label>For</label>
+        <select id="editItemFor">
+          <option value="junior">Junior</option>
+          <option value="senior">Senior</option>
+          <option value="both">Both</option>
+        </select>
+
+        <label>Upload Image</label>
+        <input type="file" id="editItemImage" accept="image/*" />
+        <div id="editImagePreview" style="margin-top: 10px"></div>
+
+        <div class="buttons">
+          <button class="cancel-btn" onclick="closeEditItemModal()">
+            Cancel
+          </button>
+          <button class="add-btn" onclick="saveEditedItem()">
+            Save Changes
+          </button>
+        </div>
+  
+        </div>
+      </div>
+    </div>
+
+    <script>
+            function removeEditingItem() {
+              if (editingItemIndex !== -1 && confirm('Delete this item?')) {
+                equipmentItems.splice(editingItemIndex, 1);
+                // Save to localStorage
+                localStorage.setItem('inventoryData', JSON.stringify(equipmentItems));
+                filteredItems = [...equipmentItems];
+                closeEditItemModal();
+                renderItems(filteredItems);
+              }
+            }
+      // Equipment Data
+      // Always load from localStorage if available, else use default
+      let equipmentItems = JSON.parse(localStorage.getItem('inventoryData')) || [
+        {
+          name: "Sample Laptop",
+          image: "assets/coby-laptop-01.jpg",
+          available: 5,
+          category: "electronics"
+        }
+      ];
+      let filteredItems = [...equipmentItems];
+      let selectMode = false;
+      function renderItems(items) {
+        const grid = document.getElementById("itemsGrid");
+        grid.innerHTML = "";
+        items.forEach((item, index) => {
+          const card = document.createElement("div");
+          card.className = "item-card";
+          const statusClass = item.available > 0 ? "available" : "not-available";
+          const statusText = item.available > 0 ? "Available" : "Not available";
+          let checkboxHTML = selectMode ? `<input type='checkbox' class='item-checkbox' data-index='${index}' style='position:absolute;top:8px;left:8px;transform:scale(1.3);' />` : "";
+          card.innerHTML = `
+            <div style='position:relative;'>${checkboxHTML}<div class="card-icon">
+                <img src="${item.image}" alt="${item.name}" class="item-image">
+            </div></div>
+            <div class="card-info">
+                <div class="item-name">${item.name}</div>
+                <button class="status-badge ${statusClass}">${statusText}</button>
+                <button class="delete-btn" data-index="${index}" title="Delete item">Delete</button>
+            </div>
+          `;
+
+          const deleteBtn = card.querySelector('.delete-btn');
+          deleteBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            deleteItem(index);
+          });
+
+          if (selectMode) {
+            card.style.cursor = 'pointer';
+            card.onclick = (e) => {
+              if (e.target.classList.contains('delete-btn') || e.target.closest('.delete-btn')) return;
+              // Only toggle if not clicking directly on checkbox
+              if (!e.target.classList.contains('item-checkbox')) {
+                const cb = card.querySelector('.item-checkbox');
+                if (cb) cb.checked = !cb.checked;
+              }
+            };
+          } else {
+            card.onclick = (e) => {
+              if (e.target.classList.contains('delete-btn') || e.target.closest('.delete-btn')) return;
+              openEditItemModal(index, item);
+            };
+          }
+          grid.appendChild(card);
+        });
+      }
+      function toggleSelectMenu() {
+        const dropdown = document.getElementById('selectMenuDropdown');
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+      }
+      function enableSelectMode() {
+        selectMode = true;
+        document.getElementById('selectMenuDropdown').style.display = 'none';
+        document.getElementById('selectActionsBar').style.display = 'block';
+        renderItems(filteredItems);
+      }
+      function disableSelectMode() {
+        selectMode = false;
+        document.getElementById('selectActionsBar').style.display = 'none';
+        renderItems(filteredItems);
+      }
+      function removeSelectedItems() {
+        const checkboxes = document.querySelectorAll('.item-checkbox');
+        const toRemove = [];
+        checkboxes.forEach(cb => {
+          if (cb.checked) toRemove.push(parseInt(cb.getAttribute('data-index')));
+        });
+        if (toRemove.length === 0) {
+          alert('No items selected!');
+          return;
+        }
+        if (!confirm('Remove selected item(s)?')) return;
+        // Remove from highest index to lowest
+        toRemove.sort((a,b)=>b-a).forEach(idx=>{
+          equipmentItems.splice(idx,1);
+        });
+        localStorage.setItem('inventoryData', JSON.stringify(equipmentItems));
+        filteredItems = [...equipmentItems];
+        disableSelectMode();
+      }
+
+      function deleteItem(index) {
+        if (!confirm('Delete this item permanently?')) return;
+        equipmentItems.splice(index, 1);
+        localStorage.setItem('inventoryData', JSON.stringify(equipmentItems));
+        filteredItems = [...equipmentItems];
+        renderItems(filteredItems);
+      }
+
+      function filterByCategory(category) {
+        if (category === "all") {
+          filteredItems = [...equipmentItems];
+        } else {
+          filteredItems = equipmentItems.filter(
+            (item) => item.category === category,
+          );
+        }
+        renderItems(filteredItems);
+            // Borrower type dropdown event
+            document.getElementById('borrowerType').addEventListener('change', function(e) {
+              borrowerType = e.target.value;
+              renderItems(filteredItems);
+            });
+      }
+
+      document
+        .getElementById("newItemImage")
+        .addEventListener("change", function (e) {
+          const file = e.target.files[0];
+          const preview = document.getElementById("imagePreview");
+          preview.innerHTML = "";
+
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+              const img = document.createElement("img");
+              img.src = event.target.result;
+              img.style.maxWidth = "100%";
+              img.style.maxHeight = "150px";
+              img.style.borderRadius = "8px";
+              preview.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+
+      function openAddItemModal() {
+        document.getElementById("addItemModal").style.display = "flex";
+      }
+
+      function closeAddItemModal() {
+        document.getElementById("addItemModal").style.display = "none";
+        document.getElementById("newItemName").value = "";
+        document.getElementById("newItemAvailable").value = 1;
+        document.getElementById("newItemImage").value = "";
+        document.getElementById("imagePreview").innerHTML = "";
+      }
+
+      function saveNewItem() {
+        const name = document.getElementById("newItemName").value.trim();
+        const category = document.getElementById("newItemCategory").value;
+        const available =
+          parseInt(document.getElementById("newItemAvailable").value) || 0;
+        const imageFile = document.getElementById("newItemImage").files[0];
+        const forWhom = document.getElementById("newItemFor").value;
+
+        if (!name) {
+          alert("Please enter item name");
+          return;
+        }
+
+        let imageUrl = "assets/form.png";
+
+        if (imageFile) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            imageUrl = event.target.result;
+            addItemToList(name, category, available, imageUrl, forWhom);
+          };
+          reader.readAsDataURL(imageFile);
+        } else {
+          addItemToList(name, category, available, imageUrl, forWhom);
+        }
+      }
+
+      function addItemToList(name, category, available, image) {
+        const forWhom = arguments.length > 4 ? arguments[4] : "both";
+        const newItem = { name, image, available, category, for: forWhom };
+        equipmentItems.push(newItem);
+        // Save to localStorage immediately
+        localStorage.setItem('inventoryData', JSON.stringify(equipmentItems));
+        filteredItems = [...equipmentItems];
+        renderItems(filteredItems);
+        closeAddItemModal();
+        alert("Item added successfully!");
+      }
+
+      // Utility function to save all items (can be called on logout or other events)
+      function saveAllItemsToLocalStorage() {
+        localStorage.setItem('inventoryData', JSON.stringify(equipmentItems));
+      }
+
+      let editingItemIndex = -1;
+
+      function openEditItemModal(index, item) {
+          document.getElementById("editItemFor").value = item.for || "both";
+        editingItemIndex = index;
+        document.getElementById("editItemName").value = item.name;
+        document.getElementById("editItemCategory").value = item.category;
+        document.getElementById("editItemAvailable").value = item.available;
+
+        const preview = document.getElementById("editImagePreview");
+        preview.innerHTML = "";
+        if (item.image) {
+          const img = document.createElement("img");
+          img.src = item.image;
+          img.style.maxWidth = "100%";
+          img.style.maxHeight = "150px";
+          img.style.borderRadius = "8px";
+          preview.appendChild(img);
+        }
+
+        document.getElementById("editItemModal").style.display = "flex";
+      }
+
+      function closeEditItemModal() {
+        document.getElementById("editItemModal").style.display = "none";
+        document.getElementById("editItemName").value = "";
+        document.getElementById("editItemAvailable").value = 1;
+        document.getElementById("editItemImage").value = "";
+        document.getElementById("editImagePreview").innerHTML = "";
+        editingItemIndex = -1;
+      }
+
+      function saveEditedItem() {
+        const name = document.getElementById("editItemName").value.trim();
+        const category = document.getElementById("editItemCategory").value;
+        const available =
+          parseInt(document.getElementById("editItemAvailable").value) || 0;
+        const imageFile = document.getElementById("editItemImage").files[0];
+        const forWhom = document.getElementById("editItemFor").value;
+
+        if (!name) {
+          alert("Please enter item name");
+          return;
+        }
+
+        if (imageFile) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            updateItem(
+              editingItemIndex,
+              name,
+              category,
+              available,
+              event.target.result,
+              forWhom
+            );
+          };
+          reader.readAsDataURL(imageFile);
+        } else {
+          updateItem(
+            editingItemIndex,
+            name,
+            category,
+            available,
+            equipmentItems[editingItemIndex].image,
+            forWhom
+          );
+        }
+      }
+
+      function updateItem(index, name, category, available, image) {
+        const forWhom = arguments.length > 5 ? arguments[5] : "both";
+        equipmentItems[index] = { name, image, available, category, for: forWhom };
+        // Save to localStorage
+        localStorage.setItem('inventoryData', JSON.stringify(equipmentItems));
+        filteredItems = [...equipmentItems];
+        renderItems(filteredItems);
+        closeEditItemModal();
+        alert("Item updated successfully!");
+      }
+
+      document
+        .getElementById("editItemImage")
+        .addEventListener("change", function (e) {
+          const file = e.target.files[0];
+          const preview = document.getElementById("editImagePreview");
+          preview.innerHTML = "";
+
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+              const img = document.createElement("img");
+              img.src = event.target.result;
+              img.style.maxWidth = "100%";
+              img.style.maxHeight = "150px";
+              img.style.borderRadius = "8px";
+              preview.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      // Initialize
+      renderItems(equipmentItems);
+      // Save items to localStorage on page unload
+      window.addEventListener('beforeunload', function() {
+        localStorage.setItem('inventoryData', JSON.stringify(equipmentItems));
+      });
+    </script>
+
+    <!-- Reserve Item Modal -->
+    <div id="reserveModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <span class="close" onclick="closeReserveModal()">&times;</span>
+        <h3>📋 Reserve Equipment</h3>
+        <form onsubmit="submitReservation(event)">
+          <label>Student Name:</label>
+          <input
+            type="text"
+            id="reserveStudentName"
+            required
+            placeholder="Enter full name"
+          />
+
+          <label>Student ID/LRN:</label>
+          <input
+            type="text"
+            id="reserveStudentLRN"
+            required
+            placeholder="Enter student ID"
+          />
+
+          <label>Item Name:</label>
+          <input
+            type="text"
+            id="reserveItemName"
+            readonly
+            placeholder="Selected item"
+          />
+
+          <label>Expected Pickup Date:</label>
+          <input type="date" id="reserveExpectedDate" required />
+
+          <label>Remarks (optional):</label>
+          <textarea
+            id="reserveRemarks"
+            placeholder="Add any notes..."
+            style="min-height: 80px"
+          ></textarea>
+
+          <div style="display: flex; gap: 10px; margin-top: 20px">
+            <button type="submit" class="save-btn">✓ Reserve</button>
+            <button
+              type="button"
+              class="cancel-btn"
+              onclick="closeReserveModal()"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Reserve Modal Functions
+      function openReserveModal(itemName) {
+        document.getElementById("reserveItemName").value = itemName;
+        document.getElementById("reserveStudentName").value = "";
+        document.getElementById("reserveStudentLRN").value = "";
+        document.getElementById("reserveExpectedDate").value = "";
+        document.getElementById("reserveRemarks").value = "";
+        document.getElementById("reserveModal").style.display = "flex";
+      }
+
+      function closeReserveModal() {
+        document.getElementById("reserveModal").style.display = "none";
+      }
+
+      function submitReservation(event) {
+        event.preventDefault();
+        const studentName = document
+          .getElementById("reserveStudentName")
+          .value.trim();
+        const studentLRN = document
+          .getElementById("reserveStudentLRN")
+          .value.trim();
+        const itemName = document.getElementById("reserveItemName").value;
+        const expectedDate = document.getElementById(
+          "reserveExpectedDate",
+        ).value;
+        const remarks = document.getElementById("reserveRemarks").value.trim();
+
+        if (!studentName || !studentLRN || !itemName || !expectedDate) {
+          alert("⚠️ Please fill in all required fields!");
+          return;
+        }
+
+        const reservation = {
+          id: Date.now(),
+          studentName,
+          studentLRN,
+          itemName,
+          expectedDate,
+          remarks: remarks || "-",
+          createdAt: new Date().toLocaleString(),
+          status: "pending",
+        };
+
+        const reservations = JSON.parse(
+          localStorage.getItem("reservations") || "[]",
+        );
+        reservations.push(reservation);
+        localStorage.setItem("reservations", JSON.stringify(reservations));
+
+        // Notify system
+        if (typeof checkNewReservations === "function") {
+          checkNewReservations();
+        }
+
+        alert("✅ Reservation created successfully!");
+        closeReserveModal();
+      }
+
+      // Close modal when clicking outside
+      window.onclick = function (event) {
+        const modal = document.getElementById("reserveModal");
+        if (event.target === modal) {
+          closeReserveModal();
+        }
+      };
+    </script>
+
+    <script>
+      // ========================
+      // ADMIN PROFILE DROPDOWN
+      // ========================
+      function toggleProfileDropdown() {
+        const dropdown = document.getElementById("profileDropdown");
+        const btn = document.querySelector(".admin-profile-btn");
+
+        if (dropdown.classList.contains("active")) {
+          dropdown.classList.remove("active");
+          btn.classList.remove("active");
+        } else {
+          dropdown.classList.add("active");
+          btn.classList.add("active");
+        }
+      }
+
+      function editProfileClick() {
+        window.location.href = "settings.html";
+      }
+
+      function showEditProfile() {
+        editProfileClick();
+      }
+
+      function loadAdminProfile() {
+        const currentUser = localStorage.getItem("currentUser");
+        let username = "Administrator";
+        let email = "admin@logbook.com";
+
+        if (currentUser) {
+          try {
+            const user = JSON.parse(currentUser);
+            username = user.username || "Administrator";
+            email = user.email || "admin@logbook.com";
+          } catch (e) {
+            console.warn("Error parsing currentUser:", e);
+          }
+        }
+
+        document.getElementById("profileUsername").textContent = username;
+        document.getElementById("profileEmail").textContent = email;
+        const adminName = document.querySelector(".admin-name");
+        if (adminName) adminName.textContent = username.split(" ")[0];
+      }
+
+      function logout() {
+        if (confirm("Are you sure you want to logout?")) {
+          saveAllItemsToLocalStorage();
+          localStorage.removeItem("currentUser");
+          window.location.href = "admin-login.html";
+        }
+      }
+
+      document.addEventListener("click", function (event) {
+        const profileContainer = document.querySelector(
+          ".admin-profile-container",
+        );
+        const dropdown = document.getElementById("profileDropdown");
+
+        if (profileContainer && !profileContainer.contains(event.target)) {
+          dropdown.classList.remove("active");
+          document
+            .querySelector(".admin-profile-btn")
+            .classList.remove("active");
+        }
+      });
+
+      // Load admin profile on page load
+      document.addEventListener("DOMContentLoaded", loadAdminProfile);
+    </script>
+
+    <script src="js/profile.js"></script>
+    <script src="js/logout.js"></script>
+  </body>
+</html>
+

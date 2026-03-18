@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings | Digital Logbook</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/settings.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+  </head>
+
+  <body>
+    <div class="background-container">
+      <!-- TOP NAVBAR -->
+      <nav class="top-navbar">
+        <div class="nav-container">
+          <div class="nav-left">
+            <div class="admin-info">
+              <img src="assets/logo.png" alt="Logo" />
+            </div>
+            <h2 class="nav-title">ADMIN DIGITAL LOGBOOK</h2>
+          </div>
+
+          <ul class="nav-menu">
+            <li>
+              <a href="dashboard.html">
+                <i class="fa-solid fa-chart-simple"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="student_records.html">
+                <i class="fa-solid fa-users"></i>
+                <span>Student Records</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="dcp.html">
+                <i class="fa-solid fa-laptop"></i>
+                <span>DCP Package</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="transaction.html">
+                <i class="fa-solid fa-folder"></i>
+                <span>Transaction</span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="nav-controls">
+            <!-- Admin Profile Dropdown -->
+            <div class="admin-profile-container">
+              <button
+                class="admin-profile-btn"
+                onclick="toggleProfileDropdown()"
+                title="Admin Profile"
+              >
+                <i
+                  class="fa-solid fa-user admin-avatar-icon"
+                  aria-hidden="true"
+                ></i>
+              </button>
+              <div class="profile-dropdown" id="profileDropdown">
+                <div class="profile-header">
+                  <i
+                    class="fa-solid fa-circle-user profile-avatar-icon"
+                    aria-hidden="true"
+                  ></i>
+                  <div class="profile-info">
+                    <h3 id="profileUsername">Administrator</h3>
+                    <p id="profileEmail">admin@logbook.com</p>
+                  </div>
+                </div>
+                <div class="profile-divider"></div>
+                <button class="profile-menu-item" onclick="showEditProfile()">
+                  <i class="fa-solid fa-user-pen"></i>
+                  <span>Profile</span>
+                </button>
+                <button
+                  class="profile-menu-item"
+                  onclick="window.location.href = 'notifications.html'"
+                >
+                  <i class="fa-solid fa-bell"></i>
+                  <span>Notifications</span>
+                </button>
+                <button
+                  class="profile-menu-item"
+                  onclick="window.location.href = 'settings.html'"
+                >
+                  <i class="fa-solid fa-gear"></i>
+                  <span>Settings</span>
+                </button>
+                <button class="profile-menu-item" onclick="logout()">
+                  <i class="fa-solid fa-sign-out-alt"></i>
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- MAIN CONTENT -->
+      <div class="main-content">
+        <div class="settings-wrapper">
+          <!-- Left Menu -->
+          <div class="settings-menu">
+            <ul>
+              <li class="active" onclick="showTab('account')">
+                <i class="fas fa-user"></i> Account
+              </li>
+              <li onclick="showTab('password')">
+                <i class="fas fa-lock"></i> Password
+              </li>
+              <li onclick="showTab('system')">
+                <i class="fas fa-cog"></i> System
+              </li>
+              <li onclick="showTab('developers')">
+                <i class="fas fa-code"></i> Developers
+              </li>
+              <li onclick="showTab('archive')">
+                <i class="fas fa-archive"></i> Archive
+              </li>
+            </ul>
+          </div>
+
+          <!-- Right Panel -->
+          <div class="settings-content">
+            <!-- Account Info -->
+            <div class="tab-content active" id="account">
+              <h2>Account Information</h2>
+              <label>Username:</label>
+              <input type="text" id="username" placeholder="Admin" />
+              <label>Email:</label>
+              <input type="email" id="email" placeholder="admin@email.com" />
+              <button class="save-btn" onclick="saveAccount()">
+                Save Changes
+              </button>
+            </div>
+
+            <!-- Change Password -->
+            <div class="tab-content" id="password">
+              <h2>Change Password</h2>
+              <div class="password-field">
+                <label>Current Password:</label>
+                <div class="input-wrapper">
+                  <input
+                    type="password"
+                    id="currentPass"
+                    placeholder="Enter current password"
+                  />
+                </div>
+              </div>
+              <div class="password-field">
+                <label>New Password:</label>
+                <div class="input-wrapper">
+                  <input
+                    type="password"
+                    id="newPass"
+                    placeholder="Enter new password"
+                  />
+                </div>
+              </div>
+              <div class="password-field">
+                <label>Confirm New Password:</label>
+                <div class="input-wrapper">
+                  <input
+                    type="password"
+                    id="confirmPass"
+                    placeholder="Confirm new password"
+                  />
+                </div>
+              </div>
+              <button class="save-btn" onclick="changePassword()">
+                Update Password
+              </button>
+            </div>
+
+            <!-- Notifications -->
+            <div class="tab-content" id="notifications">
+              <h2>Notifications</h2>
+              <label
+                ><input type="checkbox" checked /> Enable sound alerts</label
+              >
+              <label
+                ><input type="checkbox" /> Show desktop notifications</label
+              >
+            </div>
+
+            <!-- System -->
+            <div class="tab-content" id="system">
+              <h2>System</h2>
+              <p>You can reset or restore system data here.</p>
+
+              <div class="system-buttons">
+                <button class="reset-btn" onclick="restoreItems()">
+                  🔄 Restore Items
+                </button>
+              </div>
+            </div>
+
+            <!-- Developers -->
+            <div class="tab-content" id="developers">
+              <h2>Development Team</h2>
+              <p class="description">
+                Manage your development team members here.
+              </p>
+
+              <!-- Developer Management Section: Add, edit, and manage team member slots for the development team -->
+              <div class="developer-slots" id="developerSlots">
+                <!-- Developer slots will be generated here dynamically via JavaScript -->
+              </div>
+
+              <!-- Developer Profile Display Section: View and showcase all current team members with their roles and information -->
+              <h3
+                style="
+                  margin-top: 40px;
+                  color: #667eea;
+                  font-weight: 700;
+                  margin-bottom: 20px;
+                "
+              >
+                Team Members
+              </h3>
+              <p style="color: #666; font-size: 13px; margin-bottom: 20px">
+                Below are the core developers contributing to the Digital
+                Logbook system:
+              </p>
+              <div class="developers-grid">
+                <!-- Developer Card: Displays developer profile picture, name, and role/title. Click to view detailed information -->
+                <div
+                  class="developer-card"
+                  onclick="
+                    showDeveloperInfo(
+                      'Tracy Doce',
+                      'Developer',
+                      'assets/Tracy.png',
+                      'Full-stack developer specializing in web applications and system architecture.',
+                    )
+                  "
+                >
+                  <img src="assets/Tracy.png" alt="Developer 1" />
+                  <h3>Tracy Doce</h3>
+                  <p>Developer</p>
+                </div>
+                <div
+                  class="developer-card"
+                  onclick="
+                    showDeveloperInfo(
+                      'Charm Caithlyn Doce',
+                      'Developer',
+                      'assets/caith.png',
+                      'Frontend developer with expertise in UI/UX design and responsive layouts.',
+                    )
+                  "
+                >
+                  <img src="assets/caith.png" alt="Developer 2" />
+                  <h3>Charm Caithlyn Doce</h3>
+                  <p>Developer</p>
+                </div>
+                <div
+                  class="developer-card"
+                  onclick="
+                    showDeveloperInfo(
+                      'Rogelio Calano',
+                      'Developer',
+                      'assets/Calano.png',
+                      'Backend developer specializing in database design and API development.',
+                    )
+                  "
+                >
+                  <img src="assets/Calano.png" alt="Developer 3" />
+                  <h3>Rogelio Calano</h3>
+                  <p>Developer</p>
+                </div>
+                <div
+                  class="developer-card"
+                  onclick="
+                    showDeveloperInfo(
+                      'Jhon Lloyd Alegre',
+                      'Developer',
+                      'assets/Lloyd.png',
+                      'Full-stack developer with focus on system integration and performance optimization.',
+                    )
+                  "
+                >
+                  <img src="assets/Lloyd.png" alt="Developer 4" />
+                  <h3>Jhon Lloyd Alegre</h3>
+                  <p>Developer</p>
+                </div>
+                <div
+                  class="developer-card"
+                  onclick="
+                    showDeveloperInfo(
+                      'John Eric Alvarez',
+                      'Developer',
+                      'assets/Eric.png',
+                      'Frontend developer experienced in JavaScript frameworks and interactive components.',
+                    )
+                  "
+                >
+                  <img src="assets/Eric.png" alt="Developer 5" />
+                  <h3>John Eric Alvarez</h3>
+                  <p>Developer</p>
+                </div>
+                <div
+                  class="developer-card"
+                  onclick="
+                    showDeveloperInfo(
+                      'Renz Contreras',
+                      'Developer',
+                      'assets/Renz.png',
+                      'Database and backend specialist with expertise in data management and security.',
+                    )
+                  "
+                >
+                  <img src="assets/Renz.png" alt="Developer 6" />
+                  <h3>Renz Contreras</h3>
+                  <p>Developer</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Archive -->
+            <div class="tab-content" id="archive">
+              <h2>Transaction Archive</h2>
+              <p class="description">
+                View and manage archived transaction records.
+              </p>
+
+              <div class="archive-controls">
+                <input
+                  type="text"
+                  id="archiveSearch"
+                  placeholder="Search in archive..."
+                  class="archive-search"
+                />
+                <button class="restore-all-btn" onclick="restoreAllArchive()">
+                  <i class="fa-solid fa-undo"></i> Restore All
+                </button>
+                <button class="clear-archive-btn" onclick="clearAllArchive()">
+                  <i class="fa-solid fa-trash"></i> Clear All
+                </button>
+              </div>
+
+              <div class="archive-table-container">
+                <table id="archiveTable">
+                  <thead>
+                    <tr>
+                      <th>Borrower ID</th>
+                      <th>Student Name</th>
+                      <th>Item</th>
+                      <th>Quantity</th>
+                      <th>Date Borrowed</th>
+                      <th>Date Returned</th>
+                      <th>Archived Date</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="archiveBody">
+                    <tr id="emptyArchiveRow">
+                      <td
+                        colspan="8"
+                        style="
+                          text-align: center;
+                          color: gray;
+                          font-style: italic;
+                          padding: 20px;
+                        "
+                      >
+                        No archived records yet.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div id="backupSection"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="modal" style="display: none">
+      <div class="modal-content edit-profile-modal">
+        <span class="close" onclick="closeEditProfileModal()">&times;</span>
+        <h2>Edit Profile</h2>
+        <div class="edit-profile-form">
+          <div class="form-group">
+            <label for="editUsername">Username:</label>
+            <input type="text" id="editUsername" placeholder="Enter username" />
+          </div>
+          <div class="form-group">
+            <label for="editEmail">Email:</label>
+            <input type="email" id="editEmail" placeholder="Enter email" />
+          </div>
+          <div class="form-buttons">
+            <button class="save-profile-btn" onclick="saveProfileChanges()">
+              <i class="fa-solid fa-check"></i> Save Changes
+            </button>
+            <button
+              class="cancel-profile-btn"
+              onclick="closeEditProfileModal()"
+            >
+              <i class="fa-solid fa-xmark"></i> Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ Loading Modal -->
+    <div id="loadingModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <div class="spinner"></div>
+        <p id="loadingText">Processing...</p>
+      </div>
+    </div>
+
+    <!-- Developer Information Modal -->
+    <div
+      id="developerModal"
+      class="modal"
+      style="display: none; z-index: 10000"
+    >
+      <div class="modal-content developer-info-modal">
+        <span class="close" onclick="closeDeveloperModal()">&times;</span>
+        <div class="developer-info-container">
+          <img id="devImage" src="" alt="Developer" class="dev-modal-image" />
+          <h2 id="devName"></h2>
+          <p id="devRole" class="dev-role"></p>
+          <p id="devBio" class="dev-bio"></p>
+          <button class="close-dev-btn" onclick="closeDeveloperModal()">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ Confirmation Modal -->
+    <div id="confirmModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <p id="confirmText"></p>
+        <div class="buttons">
+          <button id="confirmYes" class="yes-btn">Yes</button>
+          <button id="confirmNo" class="no-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/profile.js"></script>
+    <script src="/js/settings.js"></script>
+    <script src="js/logout.js"></script>
+  </body>
+</html>

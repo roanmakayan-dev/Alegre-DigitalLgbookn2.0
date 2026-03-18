@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Pending Requests | Equipment Reservation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+    
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #ec4899;
+      --accent: #06b6d4;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --info: #3b82f6;
+      --pending: #f59e0b;
+      --approved: #10b981;
+      --rejected: #ef4444;
+      --senior-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      --junior-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --glass: rgba(255, 255, 255, 0.7);
+    }
+    
+    body { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--text);
+    }
+    
+    .mobile-container {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: var(--bg);
+      position: relative;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+      overflow-x: hidden;
+    }
+    
+    .bg-shapes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 280px;
+      background: var(--senior-gradient);
+      border-radius: 0 0 40px 40px;
+      z-index: 0;
+    }
+    
+    .bg-shapes::before {
+      content: '';
+      position: absolute;
+      top: 50px;
+      right: -50px;
+      width: 200px;
+      height: 200px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-20px) scale(1.1); }
+    }
+    
+    .header {
+      position: relative;
+      z-index: 10;
+      padding: 20px;
+      color: white;
+    }
+    
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .back-btn {
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+    }
+    
+    .back-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
+    
+    .header-title {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    
+    .header-subtitle {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+    
+    .content {
+      background: var(--bg);
+      border-radius: 30px 30px 0 0;
+      min-height: calc(100vh - 200px);
+      position: relative;
+      z-index: 5;
+      padding: 24px 20px 100px;
+      margin-top: -20px;
+    }
+    
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 4px;
+    }
+    
+    .filter-tabs::-webkit-scrollbar { display: none; }
+    
+    .filter-tab {
+      padding: 10px 20px;
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .filter-tab.active {
+      background: var(--senior-gradient);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .filter-tab:hover:not(.active) {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    
+    .filter-badge {
+      background: rgba(255,255,255,0.3);
+      color: white;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+    
+    .filter-tab:not(.active) .filter-badge {
+      background: #e2e8f0;
+      color: var(--text-muted);
+    }
+    
+    .request-card {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+      border-left: 4px solid var(--pending);
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .request-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    .request-card.approved { border-left-color: var(--approved); }
+    .request-card.rejected { border-left-color: var(--rejected); }
+    .request-card.returned { border-left-color: var(--info); }
+    
+    .request-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    
+    .request-item-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .request-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .request-title-group h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+    
+    .request-title-group p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .status-pending {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+    }
+    
+    .status-approved {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+    
+    .status-rejected {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--error);
+    }
+    
+    .status-returned {
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--info);
+    }
+    
+    .request-details {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+    
+    .detail-row:last-child { margin-bottom: 0; }
+    
+    .detail-label {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    
+    .detail-value {
+      color: var(--text);
+      font-weight: 600;
+    }
+    
+    .time-slot-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(99, 102, 241, 0.1);
+      color: var(--primary);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+    
+    .request-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .btn-action {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    
+    .btn-cancel {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--error);
+      border: 2px solid rgba(239, 68, 68, 0.2);
+    }
+    
+    .btn-cancel:hover {
+      background: var(--error);
+      color: white;
+    }
+    
+    .btn-view {
+      background: rgba(99, 102, 241, 0.1);
+      color: var(--primary);
+      border: 2px solid rgba(99, 102, 241, 0.2);
+    }
+    
+    .btn-view:hover {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-borrow-again {
+      background: var(--senior-gradient);
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-borrow-again:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+    
+    .empty-icon {
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 48px;
+    }
+    
+    .empty-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    
+    .empty-text {
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: 280px;
+      margin: 0 auto 24px;
+    }
+    
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: var(--senior-gradient);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+    
+    .stats-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    
+    .stat-box {
+      background: white;
+      padding: 16px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    .stat-number {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    
+    .stat-number.pending { color: var(--warning); }
+    .stat-number.approved { color: var(--success); }
+    .stat-number.rejected { color: var(--error); }
+    
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .timeline-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed #e2e8f0;
+    }
+    
+    .timeline-step {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    
+    .timeline-step.active {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    
+    .timeline-step.completed {
+      color: var(--success);
+    }
+    
+    .timeline-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #cbd5e1;
+    }
+    
+    .timeline-step.active .timeline-dot { background: var(--primary); }
+    .timeline-step.completed .timeline-dot { background: var(--success); }
+    
+    .rejection-reason {
+      background: rgba(239, 68, 68, 0.05);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 8px;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--error);
+    }
+    
+    .rejection-reason i {
+      margin-right: 6px;
+    }
+    
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: #1e293b;
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      z-index: 2000;
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    
+    .toast-icon {
+      width: 24px;
+      height: 24px;
+      background: var(--success);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    
+    .loading-skeleton {
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 12px;
+      height: 200px;
+      margin-bottom: 16px;
+    }
+    
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .modal.show {
+      display: flex;
+      opacity: 1;
+    }
+    
+    .modal-content {
+      background: white;
+      width: 100%;
+      max-width: 480px;
+      border-radius: 30px 30px 0 0;
+      padding: 24px;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .modal.show .modal-content {
+      transform: translateY(0);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    
+    .modal-close {
+      width: 36px;
+      height: 36px;
+      background: #f1f5f9;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.3s;
+    }
+    
+    .modal-close:hover { background: #e2e8f0; color: var(--text); }
+    
+    .detail-modal-content {
+      text-align: center;
+      padding: 20px 0;
+    }
+    
+    .detail-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      margin: 0 auto 20px;
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+    }
+    
+    .detail-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .detail-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+    
+    .detail-grid {
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 20px;
+      text-align: left;
+      margin-bottom: 24px;
+    }
+    
+    .detail-row-modal {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .detail-row-modal:last-child {
+      border-bottom: none;
+    }
+    
+    .detail-label-modal {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    
+    .detail-value-modal {
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    
+    @media (max-width: 380px) {
+      .stats-summary { grid-template-columns: 1fr; }
+      .request-actions { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-container">
+    <div class="bg-shapes"></div>
+    
+    <header class="header">
+      <div class="header-top">
+        <a href="#" class="back-btn" onclick="goBack()">
+          <i class="fas fa-arrow-left"></i>
+        </a>
+        <div style="text-align: right;">
+          <div style="font-size: 12px; opacity: 0.8;">Student Portal</div>
+          <div style="font-size: 13px; font-weight: 600;">LRN: <span id="studentLrn">2024-001</span></div>
+        </div>
+      </div>
+      
+      <h1 class="header-title">Pending Requests</h1>
+      <p class="header-subtitle">Track all your equipment borrow requests</p>
+    </header>
+
+    <main class="content">
+      <!-- Stats Summary -->
+      <div class="stats-summary">
+        <div class="stat-box">
+          <div class="stat-number pending" id="pendingCount">0</div>
+          <div class="stat-label">Pending</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number approved" id="approvedCount">0</div>
+          <div class="stat-label">Approved</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number rejected" id="rejectedCount">0</div>
+          <div class="stat-label">Rejected</div>
+        </div>
+      </div>
+      
+      <!-- Filter Tabs -->
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="filterRequests('all', this)">
+          <i class="fas fa-list"></i> All
+          <span class="filter-badge" id="badgeAll">0</span>
+        </button>
+        <button class="filter-tab" onclick="filterRequests('pending', this)">
+          <i class="fas fa-clock"></i> Pending
+          <span class="filter-badge" id="badgePending">0</span>
+        </button>
+        <button class="filter-tab" onclick="filterRequests('approved', this)">
+          <i class="fas fa-check"></i> Approved
+          <span class="filter-badge" id="badgeApproved">0</span>
+        </button>
+        <button class="filter-tab" onclick="filterRequests('rejected', this)">
+          <i class="fas fa-times"></i> Rejected
+          <span class="filter-badge" id="badgeRejected">0</span>
+        </button>
+      </div>
+      
+      <!-- Requests List -->
+      <div id="requestsList">
+        <div class="loading-skeleton"></div>
+        <div class="loading-skeleton"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Request Detail Modal -->
+  <div id="detailModal" class="modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Request Details</h3>
+        <button class="modal-close" onclick="closeDetailModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="detail-modal-content" id="modalContent">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Cancel Confirmation Modal -->
+  <div id="cancelModal" class="modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Cancel Request</h3>
+        <button class="modal-close" onclick="closeCancelModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div style="text-align: center; padding: 20px 0;">
+        <div style="font-size: 64px; margin-bottom: 16px;">⚠️</div>
+        <h4 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Cancel this request?</h4>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 24px;">
+          This action cannot be undone. The equipment will be released for other students.
+        </p>
+        <div style="display: flex; gap: 12px;">
+          <button class="btn-action btn-view" onclick="closeCancelModal()" style="flex: 1;">
+            Keep Request
+          </button>
+          <button class="btn-action btn-cancel" onclick="confirmCancel()" style="flex: 1;">
+            Yes, Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">
+    <div class="toast-icon"><i class="fas fa-check"></i></div>
+    <span id="toastMessage">Success!</span>
+  </div>
+
+  <script>
+    // Get current user info from localStorage
+    const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {
+      name: 'Student User',
+      lrn: '2024-001',
+      role: 'senior' // or 'junior'
+    };
+    
+    let allRequests = [];
+    let currentFilter = 'all';
+    let cancelRequestId = null;
+    
+    function init() {
+      document.getElementById('studentLrn').textContent = currentUser.lrn;
+      loadRequests();
+      updateStats();
+      renderRequests();
+      
+      // Simulate loading
+      setTimeout(() => {
+        renderRequests();
+      }, 800);
+    }
+    
+    function loadRequests() {
+      // Load from localStorage - combine both senior and junior requests
+      const seniorRequests = JSON.parse(localStorage.getItem('seniorReservations')) || [];
+      const borrowRequests = JSON.parse(localStorage.getItem('borrowRequests')) || [];
+      
+      // Get requests for current user
+      allRequests = borrowRequests.filter(req => 
+        req.lrn === currentUser.lrn || req.userName === currentUser.name
+      ).map(req => ({
+        ...req,
+        type: 'borrow',
+        createdAt: req.createdAt || new Date().toISOString()
+      }));
+      
+      // Also check if there are any active reservations that need approval
+      const activeReservations = seniorRequests.filter(res => 
+        res.status === 'active' || res.status === 'pending'
+      );
+      
+      // Merge and sort by date (newest first)
+      allRequests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+    
+    function updateStats() {
+      const pending = allRequests.filter(r => r.status === 'pending').length;
+      const approved = allRequests.filter(r => r.status === 'approved').length;
+      const rejected = allRequests.filter(r => r.status === 'rejected').length;
+      const total = allRequests.length;
+      
+      document.getElementById('pendingCount').textContent = pending;
+      document.getElementById('approvedCount').textContent = approved;
+      document.getElementById('rejectedCount').textContent = rejected;
+      
+      document.getElementById('badgeAll').textContent = total;
+      document.getElementById('badgePending').textContent = pending;
+      document.getElementById('badgeApproved').textContent = approved;
+      document.getElementById('badgeRejected').textContent = rejected;
+    }
+    
+    function renderRequests() {
+      const container = document.getElementById('requestsList');
+      
+      let filtered = allRequests;
+      if (currentFilter !== 'all') {
+        filtered = allRequests.filter(r => r.status === currentFilter);
+      }
+      
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <h3 class="empty-title">No ${currentFilter === 'all' ? '' : currentFilter} requests</h3>
+            <p class="empty-text">
+              ${currentFilter === 'all' 
+                ? 'You haven\'t made any equipment requests yet. Browse available equipment and make your first request!' 
+                : `You don't have any ${currentFilter} requests at the moment.`}
+            </p>
+            <a href="${currentUser.role === 'senior' ? 'senior-dashboard.html' : 'junior-dashboard.html'}" class="btn-primary">
+              <i class="fas fa-search"></i> Browse Equipment
+            </a>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = filtered.map(req => createRequestCard(req)).join('');
+    }
+    
+    function createRequestCard(req) {
+      const isPending = req.status === 'pending';
+      const isApproved = req.status === 'approved';
+      const isRejected = req.status === 'rejected';
+      
+      const statusClass = `status-${req.status}`;
+      const cardClass = req.status;
+      
+      // Get equipment icon based on item name
+      const iconMap = {
+        'Arduino': '🔌',
+        'Raspberry': '🍓',
+        'Microscope': '🔬',
+        'Spectrometer': '🌈',
+        '3D Printer': '🖨️',
+        'CNC': '⚙️',
+        'Oscilloscope': '📈',
+        'Camera': '📷',
+        'Drone': '🚁',
+        'VR': '🥽',
+        'PCR': '🧬',
+        'Laser': '⚡',
+        'Soldering': '🔥',
+        'Bio-Reactor': '🧪',
+        'Gimbal': '🎥',
+        'Logic': '📊'
+      };
+      
+      let icon = '📦';
+      for (const [key, value] of Object.entries(iconMap)) {
+        if (req.itemName && req.itemName.includes(key)) {
+          icon = value;
+          break;
+        }
+      }
+      
+      const requestDate = new Date(req.createdAt).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+      
+      const expectedReturn = req.expectedReturnDate 
+        ? new Date(req.expectedReturnDate).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric'
+          })
+        : 'Not specified';
+      
+      return `
+        <div class="request-card ${cardClass}" id="request-${req.id}">
+          <div class="request-header">
+            <div class="request-item-info">
+              <div class="request-icon">${icon}</div>
+              <div class="request-title-group">
+                <h4>${req.itemName}</h4>
+                <p>Qty: ${req.quantity} • ${requestDate}</p>
+              </div>
+            </div>
+            <span class="status-badge ${statusClass}">
+              <i class="fas fa-${isPending ? 'clock' : (isApproved ? 'check' : 'times')}"></i>
+              ${req.status}
+            </span>
+          </div>
+          
+          <div class="request-details">
+            <div class="detail-row">
+              <span class="detail-label">Purpose</span>
+              <span class="detail-value">${formatPurpose(req.purpose)}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Expected Return</span>
+              <span class="detail-value">${expectedReturn}</span>
+            </div>
+            ${req.timeSlot ? `
+            <div class="time-slot-display">
+              <i class="fas fa-clock"></i> ${req.timeSlot}
+            </div>
+            ` : ''}
+          </div>
+          
+          ${isPending ? `
+          <div class="timeline-indicator">
+            <div class="timeline-step completed">
+              <div class="timeline-dot"></div>
+              <span>Submitted</span>
+            </div>
+            <i class="fas fa-chevron-right" style="font-size: 10px; color: #cbd5e1;"></i>
+            <div class="timeline-step active">
+              <div class="timeline-dot"></div>
+              <span>Pending Approval</span>
+            </div>
+            <i class="fas fa-chevron-right" style="font-size: 10px; color: #cbd5e1;"></i>
+            <div class="timeline-step">
+              <div class="timeline-dot"></div>
+              <span>Ready</span>
+            </div>
+          </div>
+          ` : ''}
+          
+          ${isRejected && req.rejectionReason ? `
+          <div class="rejection-reason">
+            <i class="fas fa-info-circle"></i>
+            <strong>Reason:</strong> ${req.rejectionReason}
+          </div>
+          ` : ''}
+          
+          <div class="request-actions" style="margin-top: 14px;">
+            <button class="btn-action btn-view" onclick="viewDetails(${req.id})">
+              <i class="fas fa-eye"></i> View Details
+            </button>
+            ${isPending ? `
+            <button class="btn-action btn-cancel" onclick="showCancelModal(${req.id})">
+              <i class="fas fa-times"></i> Cancel
+            </button>
+            ` : isRejected ? `
+            <button class="btn-action btn-borrow-again" onclick="borrowAgain(${req.itemId})">
+              <i class="fas fa-redo"></i> Try Again
+            </button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }
+    
+    function formatPurpose(purpose) {
+      const purposes = {
+        'research': 'Research Project',
+        'thesis': 'Thesis / Capstone',
+        'lab': 'Laboratory Activity',
+        'competition': 'Competition / Event',
+        'immediate': 'Immediate Use',
+        'other': 'Other'
+      };
+      return purposes[purpose] || purpose || 'Not specified';
+    }
+    
+    function filterRequests(status, btn) {
+      currentFilter = status;
+      document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
+      btn.classList.add('active');
+      renderRequests();
+    }
+    
+    function viewDetails(requestId) {
+      const req = allRequests.find(r => r.id === requestId);
+      if (!req) return;
+      
+      const iconMap = {
+        'Arduino': '🔌',
+        'Raspberry': '🍓',
+        'Microscope': '🔬',
+        'Spectrometer': '🌈',
+        '3D Printer': '🖨️',
+        'CNC': '⚙️',
+        'Oscilloscope': '📈',
+        'Camera': '📷',
+        'Drone': '🚁',
+        'VR': '🥽',
+        'PCR': '🧬',
+        'Laser': '⚡',
+        'Soldering': '🔥',
+        'Bio-Reactor': '🧪',
+        'Gimbal': '🎥',
+        'Logic': '📊'
+      };
+      
+      let icon = '📦';
+      for (const [key, value] of Object.entries(iconMap)) {
+        if (req.itemName && req.itemName.includes(key)) {
+          icon = value;
+          break;
+        }
+      }
+      
+      const statusColors = {
+        pending: { bg: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', icon: 'clock' },
+        approved: { bg: 'rgba(16, 185, 129, 0.1)', color: '#10b981', icon: 'check' },
+        rejected: { bg: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', icon: 'times' }
+      };
+      
+      const statusStyle = statusColors[req.status];
+      
+      document.getElementById('modalContent').innerHTML = `
+        <div class="detail-icon">${icon}</div>
+        <h2 class="detail-title">${req.itemName}</h2>
+        <span class="detail-status" style="background: ${statusStyle.bg}; color: ${statusStyle.color};">
+          <i class="fas fa-${statusStyle.icon}"></i>
+          ${req.status.toUpperCase()}
+        </span>
+        
+        <div class="detail-grid">
+          <div class="detail-row-modal">
+            <span class="detail-label-modal">Request ID</span>
+            <span class="detail-value-modal">#${req.id.toString().slice(-6)}</span>
+          </div>
+          <div class="detail-row-modal">
+            <span class="detail-label-modal">Quantity</span>
+            <span class="detail-value-modal">${req.quantity} unit(s)</span>
+          </div>
+          <div class="detail-row-modal">
+            <span class="detail-label-modal">Purpose</span>
+            <span class="detail-value-modal">${formatPurpose(req.purpose)}</span>
+          </div>
+          <div class="detail-row-modal">
+            <span class="detail-label-modal">Request Date</span>
+            <span class="detail-value-modal">${new Date(req.createdAt).toLocaleString()}</span>
+          </div>
+          <div class="detail-row-modal">
+            <span class="detail-label-modal">Expected Return</span>
+            <span class="detail-value-modal">${req.expectedReturnDate ? new Date(req.expectedReturnDate).toLocaleDateString() : 'Not specified'}</span>
+          </div>
+          ${req.timeSlot ? `
+          <div class="detail-row-modal">
+            <span class="detail-label-modal">Time Slot</span>
+            <span class="detail-value-modal">${req.timeSlot}</span>
+          </div>
+          ` : ''}
+          ${req.notes ? `
+          <div class="detail-row-modal">
+            <span class="detail-label-modal">Notes</span>
+            <span class="detail-value-modal">${req.notes}</span>
+          </div>
+          ` : ''}
+        </div>
+        
+        ${req.status === 'pending' ? `
+        <button class="btn-action btn-cancel" onclick="closeDetailModal(); showCancelModal(${req.id});" style="width: 100%;">
+          <i class="fas fa-times"></i> Cancel Request
+        </button>
+        ` : req.status === 'rejected' ? `
+        <button class="btn-action btn-borrow-again" onclick="closeDetailModal(); borrowAgain(${req.itemId});" style="width: 100%;">
+          <i class="fas fa-redo"></i> Request Again
+        </button>
+        ` : ''}
+      `;
+      
+      document.getElementById('detailModal').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function showCancelModal(requestId) {
+      cancelRequestId = requestId;
+      document.getElementById('cancelModal').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function closeCancelModal() {
+      document.getElementById('cancelModal').classList.remove('show');
+      document.body.style.overflow = '';
+      cancelRequestId = null;
+    }
+    
+    function confirmCancel() {
+      if (!cancelRequestId) return;
+      
+      // Update in borrowRequests
+      let borrowRequests = JSON.parse(localStorage.getItem('borrowRequests')) || [];
+      const requestIndex = borrowRequests.findIndex(r => r.id === cancelRequestId);
+      
+      if (requestIndex > -1) {
+        borrowRequests[requestIndex].status = 'cancelled';
+        localStorage.setItem('borrowRequests', JSON.stringify(borrowRequests));
+      }
+      
+      // Also update in seniorReservations if exists
+      let seniorReservations = JSON.parse(localStorage.getItem('seniorReservations')) || [];
+      const resIndex = seniorReservations.findIndex(r => r.id === cancelRequestId);
+      if (resIndex > -1) {
+        seniorReservations[resIndex].status = 'cancelled';
+        localStorage.setItem('seniorReservations', JSON.stringify(seniorReservations));
+      }
+      
+      // Remove from current view
+      allRequests = allRequests.filter(r => r.id !== cancelRequestId);
+      
+      closeCancelModal();
+      showToast('Request cancelled successfully');
+      updateStats();
+      renderRequests();
+    }
+    
+    function borrowAgain(itemId) {
+      // Redirect to reservation page with item pre-selected
+      const params = new URLSearchParams();
+      params.set('itemId', itemId);
+      params.set('action', 'reserve');
+      
+      const dashboard = currentUser.role === 'senior' ? 'senior-dashboard.html' : 'junior-dashboard.html';
+      window.location.href = `${dashboard}?${params.toString()}`;
+    }
+    
+    function closeDetailModal() {
+      document.getElementById('detailModal').classList.remove('show');
+      document.body.style.overflow = '';
+    }
+    
+    function closeModal(event) {
+      if (event.target !== event.currentTarget) return;
+      event.currentTarget.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+    
+    function goBack() {
+      const dashboard = currentUser.role === 'senior' ? 'senior-dashboard.html' : 'junior-dashboard.html';
+      window.location.href = dashboard;
+    }
+    
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      const toastIcon = toast.querySelector('.toast-icon');
+      
+      toastMessage.textContent = message;
+      
+      if (type === 'error') {
+        toastIcon.style.background = '#ef4444';
+        toastIcon.innerHTML = '<i class="fas fa-exclamation"></i>';
+      } else {
+        toastIcon.style.background = '#10b981';
+        toastIcon.innerHTML = '<i class="fas fa-check"></i>';
+      }
+      
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+    
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

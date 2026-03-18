@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🏠 Home | Digital Logbook</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+
+<body>
+
+  <div class="background-container">
+
+    <!-- TOP NAVBAR -->
+    <nav class="top-navbar">
+      <div class="nav-container">
+        <div class="nav-left">
+          <div class="admin-info">
+            <img src="assets/logo.png" alt="Logo" />
+          </div>
+          <h2 class="nav-title">ADMIN DIGITAL LOGBOOK</h2>
+        </div>
+
+        <ul class="nav-menu">
+          <li><a href="dashboard.html" class="active">
+              <i class="fa-solid fa-chart-simple"></i>
+              <span>Dashboard</span>
+            </a></li>
+
+          <li><a href="student_records.html">
+              <i class="fa-solid fa-users"></i>
+              <span>Student Records</span>
+            </a></li>
+
+
+          <li><a href="dcp.html">
+              <i class="fa-solid fa-laptop"></i>
+              <span>DCP Package</span>
+            </a></li>
+
+          <li><a href="transaction.html">
+              <i class="fa-solid fa-folder"></i>
+              <span>Transaction</span>
+            </a></li>
+ 
+        </ul>
+
+        <div class="nav-controls">
+          <!-- Admin Profile Dropdown -->
+          <div class="admin-profile-container">
+            <button class="admin-profile-btn" onclick="toggleProfileDropdown()" title="Admin Profile">
+              <i class="fa-solid fa-user admin-avatar-icon" aria-hidden="true"></i>
+            </button>
+            <div class="profile-dropdown" id="profileDropdown">
+              <div class="profile-header">
+                <i class="fa-solid fa-circle-user profile-avatar-icon" aria-hidden="true"></i>
+                <div class="profile-info">
+                  <h3 id="profileUsername">Administrator</h3>
+                  <p id="profileEmail">admin@logbook.com</p>
+                </div>
+              </div>
+              <div class="profile-divider"></div>
+              <button class="profile-menu-item" onclick="showEditProfile()">
+                <i class="fa-solid fa-user-pen"></i>
+                <span>Profile</span>
+              </button>
+              <button class="profile-menu-item" onclick="window.location.href='notifications.html'">
+                <i class="fa-solid fa-bell"></i>
+                <span>Notifications</span>
+              </button>
+              <button class="profile-menu-item" onclick="window.location.href='settings.html'">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+              </button>
+              <button class="profile-menu-item" onclick="logout()">
+                <i class="fa-solid fa-sign-out-alt"></i>
+                <span>Logout</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <div class="content">
+
+        <!-- Overview Cards -->
+        <div class="overview-cards">
+          <div class="overview-card" onclick="showCardDetails('total')">
+            <h3><i class="fas fa-cubes"></i> Total Items</h3>
+            <p class="card-value" id="totalItems">0</p>
+            <p class="card-label">Available in inventory</p>
+          </div>
+          <div class="overview-card" onclick="showCardDetails('borrowed')">
+            <h3><i class="fas fa-share"></i> Borrowed</h3>
+            <p class="card-value" id="borrowedCount">0</p>
+            <p class="card-label">Currently out</p>
+          </div>
+          <div class="overview-card" onclick="showCardDetails('overdue')">
+            <h3><i class="fas fa-exclamation-circle"></i> Overdue Items</h3>
+            <p class="card-value" id="overdueCount">0</p>
+            <p class="card-label">Items past due date</p>
+          </div>
+          <div class="overview-card" onclick="showCardDetails('transaction')">
+            <h3><i class="fas fa-clipboard-list"></i> Transactions</h3>
+            <p class="card-value" id="transactionCount">0</p>
+            <p class="card-label">Total recorded</p>
+          </div>
+        </div>
+
+        <!-- Modal for Card Details -->
+        <div id="cardModal" class="modal-overlay" style="display: none;">
+          <div class="modal-content">
+            <button class="modal-close" onclick="closeCardModal()">&times;</button>
+            <div id="modalBody"></div>
+          </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-container">
+          <div class="chart-box">
+            <h3><i class="fas fa-chart-bar"></i> Inventory Status (Bar Chart)</h3>
+            <canvas id="barChart"></canvas>
+          </div>
+          <div class="chart-box">
+            <h3><i class="fas fa-chart-pie"></i> Item Distribution (Pie Chart)</h3>
+            <canvas id="pieChart"></canvas>
+          </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+          // Bar Chart - Inventory Status
+          const barCtx = document.getElementById('barChart').getContext('2d');
+          new Chart(barCtx, {
+            type: 'bar',
+            data: {
+              labels: ['Available', 'Borrowed', 'Damaged', 'Returned', 'Pending', 'Reserved'],
+              datasets: [{
+                label: 'Item Count',
+                data: [85, 32, 8, 15, 6, 12],
+                backgroundColor: [
+                  '#667eea',
+                  '#764ba2',
+                  '#f59e0b',
+                  '#10b981',
+                  '#ef4444',
+                  '#06b6d4'
+                ],
+                borderColor: [
+                  '#667eea',
+                  '#764ba2',
+                  '#f59e0b',
+                  '#10b981',
+                  '#ef4444',
+                  '#06b6d4'
+                ],
+                borderWidth: 1,
+                borderRadius: 6,
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              plugins: {
+                legend: {
+                  display: true,
+                  position: 'bottom'
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    stepSize: 20
+                  }
+                }
+              }
+            }
+          });
+
+          // Pie Chart - Item Distribution
+          const pieCtx = document.getElementById('pieChart').getContext('2d');
+          new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+              labels: ['Laptops', 'Tablets', 'Accessories', 'Cables', 'Others'],
+              datasets: [{
+                label: 'Items Distribution',
+                data: [28, 15, 20, 18, 19],
+                backgroundColor: [
+                  '#667eea',
+                  '#764ba2',
+                  '#f59e0b',
+                  '#10b981',
+                  '#06b6d4'
+                ],
+                borderColor: '#fff',
+                borderWidth: 2
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              plugins: {
+                legend: {
+                  display: true,
+                  position: 'bottom'
+                }
+              }
+            }
+          });
+        </script>
+
+
+        <script src="/js/home.js"></script>
+        <script>
+          // ========== DASHBOARD DATA FUNCTIONS ==========
+
+          function loadDashboardData() {
+            try {
+              // Load inventory data
+              const userType = localStorage.getItem('dcpUserType') || 'senior';
+              const inventoryKey = userType === 'junior' ? 'inventoryJunior' : 'inventorySenior';
+              let inventory = JSON.parse(localStorage.getItem(inventoryKey) || '[]');
+
+              // Fallback to senior if empty
+              if (!inventory || inventory.length === 0) {
+                inventory = JSON.parse(localStorage.getItem('inventorySenior') || '[]');
+              }
+
+              // Load transactions
+              const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+
+              // Calculate totals with safe property access
+              const totalItems = inventory.reduce((sum, item) => {
+                if (item && item.codes && Array.isArray(item.codes)) {
+                  return sum + item.codes.length;
+                }
+                return sum;
+              }, 0);
+
+              const borrowedCount = transactions.filter(t => t && t.status === 'Borrowed').length;
+              const overdueCount = transactions.filter(t => t && t.status === 'Overdue').length;
+              const transactionCount = transactions.length;
+
+              // Update card values
+              const totalEl = document.getElementById('totalItems');
+              const borrowedEl = document.getElementById('borrowedCount');
+              const overdueEl = document.getElementById('overdueCount');
+              const transactionEl = document.getElementById('transactionCount');
+
+              if (totalEl) totalEl.textContent = totalItems;
+              if (borrowedEl) borrowedEl.textContent = borrowedCount;
+              if (overdueEl) overdueEl.textContent = overdueCount;
+              if (transactionEl) transactionEl.textContent = transactionCount;
+
+              // Update charts
+              updateCharts(inventory, transactions);
+
+              return {
+                totalItems,
+                borrowedCount,
+                overdueCount,
+                transactionCount,
+                inventory,
+                transactions
+              };
+            } catch (e) {
+              console.error('Error loading dashboard data:', e);
+              return {
+                totalItems: 0,
+                borrowedCount: 0,
+                overdueCount: 0,
+                transactionCount: 0,
+                inventory: [],
+                transactions: []
+              };
+            }
+          }
+
+          function updateCharts(inventory, transactions) {
+            try {
+              const borrowed = transactions.filter(t => t && t.status === 'Borrowed').length;
+              const available = inventory.reduce((sum, item) => {
+                if (item && item.codes && Array.isArray(item.codes)) {
+                  return sum + item.codes.length;
+                }
+                return sum;
+              }, 0);
+              const overdue = transactions.filter(t => t && t.status === 'Overdue').length;
+              const returned = transactions.filter(t => t && t.status === 'Returned').length || 0;
+
+              // Update bar chart if it exists
+              const barChart = document.getElementById('barChart');
+              if (barChart && window.Chart) {
+                const instances = Chart.instances || [];
+                instances.forEach(chart => {
+                  if (chart && chart.canvas && chart.canvas.id === 'barChart') {
+                    chart.data.datasets[0].data = [available, borrowed, 0, returned, 0, 0];
+                    chart.update();
+                  }
+                });
+              }
+            } catch (e) {
+              console.warn('Chart update error:', e);
+            }
+          }
+
+          function showCardDetails(type) {
+            const data = loadDashboardData();
+            const modal = document.getElementById('cardModal');
+            const modalBody = document.getElementById('modalBody');
+            let content = '';
+
+            switch (type) {
+              case 'total':
+                content = `
+                  <h2>📦 Total Items Inventory</h2>
+                  <div style="padding: 20px; font-size: 18px;">
+                    <p><strong>Total Items Available:</strong> <span style="color: #667eea; font-size: 32px; font-weight: bold;">${data.totalItems}</span></p>
+                    <p style="margin-top: 15px; color: #666; line-height: 1.6;">Items currently available in the inventory system across all categories.</p>
+                    <div style="margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 8px;">
+                      <h4 style="margin: 0 0 10px 0; color: #333;">Breakdown by Item:</h4>
+                      <ul style="list-style: none; padding: 0; margin: 0;">
+                        ${data.inventory && data.inventory.length > 0 ?
+                    data.inventory.map(item => {
+                      const count = (item && item.codes && Array.isArray(item.codes)) ? item.codes.length : 0;
+                      return `<li style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>${item.name}:</strong> ${count} units</li>`;
+                    }).join('') :
+                    '<li style="padding: 8px; color: #999;">No inventory data available</li>'
+                  }
+                      </ul>
+                    </div>
+                  </div>
+                `;
+                break;
+
+              case 'borrowed':
+                const borrowedItems = data.transactions.filter(t => t && t.status === 'Borrowed');
+                content = `
+                  <h2>📤 Currently Borrowed Items</h2>
+                  <div style="padding: 20px; font-size: 18px;">
+                    <p><strong>Items Out:</strong> <span style="color: #764ba2; font-size: 32px; font-weight: bold;">${data.borrowedCount}</span></p>
+                    <p style="margin-top: 15px; color: #666; line-height: 1.6;">Items currently borrowed by students/staff.</p>
+                    <div style="margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 8px;">
+                      <h4 style="margin: 0 0 10px 0; color: #333;">Borrowed Items List:</h4>
+                      ${borrowedItems.length > 0 ? `
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                          ${borrowedItems.map(t => `
+                            <li style="padding: 12px; border-bottom: 1px solid #ddd; background: white; margin-bottom: 5px; border-radius: 5px;">
+                              <strong style="color: #667eea; font-size: 16px;">${t.item}</strong><br/>
+                              <span style="color: #666; font-size: 14px;">📋 Borrower: <strong>${t.studentName}</strong> (${t.borrowerId})</span><br/>
+                              <span style="color: #666; font-size: 14px;">📅 Borrowed: ${t.date}</span><br/>
+                              <span style="color: #f59e0b; font-size: 14px;">⏰ Due: ${t.dueDate}</span>
+                            </li>
+                          `).join('')}
+                        </ul>
+                      ` : '<p style="color: #999; padding: 10px; background: white; border-radius: 5px;">No items currently borrowed</p>'}
+                    </div>
+                  </div>
+                `;
+                break;
+
+              case 'overdue':
+                const overdueItems = data.transactions.filter(t => t && t.status === 'Overdue');
+                content = `
+                  <h2>⏰ Overdue Items</h2>
+                  <div style="padding: 20px; font-size: 18px;">
+                    <p><strong>Items Past Due:</strong> <span style="color: #ef4444; font-size: 32px; font-weight: bold;">${data.overdueCount}</span></p>
+                    <p style="margin-top: 15px; color: #666; line-height: 1.6;">Items not returned by the due date.</p>
+                    <div style="margin-top: 20px; padding: 15px; background: #fff5f5; border-radius: 8px; border-left: 4px solid #ef4444;">
+                      <h4 style="margin: 0 0 10px 0; color: #ef4444;">⚠️ Action Required:</h4>
+                      ${overdueItems.length > 0 ? `
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                          ${overdueItems.map(t => `
+                            <li style="padding: 12px; border-bottom: 1px solid #fecaca; background: white; margin-bottom: 5px; border-radius: 5px;">
+                              <strong style="color: #ef4444; font-size: 16px;">⚠️ ${t.item}</strong><br/>
+                              <span style="color: #666; font-size: 14px;">👤 Borrower: <strong>${t.studentName}</strong> (${t.borrowerId})</span><br/>
+                              <span style="color: #ef4444; font-size: 14px;">📅 Was Due: ${t.dueDate}</span><br/>
+                              <span style="color: #ef4444; font-weight: bold;">🚨 OVERDUE - CONTACT BORROWER</span>
+                            </li>
+                          `).join('')}
+                        </ul>
+                      ` : '<p style="color: #16a34a; padding: 10px; background: white; border-radius: 5px;">✓ No overdue items! All items returned on time.</p>'}
+                    </div>
+                  </div>
+                `;
+                break;
+
+              case 'transaction':
+                const returned = data.transactions.filter(t => t && t.status === 'Returned').length;
+                const borrowed = data.transactions.filter(t => t && t.status === 'Borrowed').length;
+                const overdue = data.transactions.filter(t => t && t.status === 'Overdue').length;
+
+                content = `
+                  <h2>📋 Transaction Summary</h2>
+                  <div style="padding: 20px; font-size: 18px;">
+                    <p><strong>Total Transactions:</strong> <span style="color: #10b981; font-size: 32px; font-weight: bold;">${data.transactionCount}</span></p>
+                    <p style="margin-top: 15px; color: #666; line-height: 1.6;">All recorded borrow and return transactions.</p>
+                    <div style="margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 8px;">
+                      <h4 style="margin: 0 0 10px 0; color: #333;">Transaction Breakdown:</h4>
+                      <ul style="list-style: none; padding: 10px 0; margin: 0;">
+                        <li style="padding: 10px; border-bottom: 1px solid #ddd; background: white; margin-bottom: 5px; border-radius: 5px;"><strong style="color: #10b981;">✅ Returned:</strong> <span style="font-size: 20px; font-weight: bold; color: #10b981;">${returned}</span> items</li>
+                        <li style="padding: 10px; border-bottom: 1px solid #ddd; background: white; margin-bottom: 5px; border-radius: 5px;"><strong style="color: #764ba2;">📤 Borrowed:</strong> <span style="font-size: 20px; font-weight: bold; color: #764ba2;">${borrowed}</span> items</li>
+                        <li style="padding: 10px; background: white; border-radius: 5px;"><strong style="color: #ef4444;">⏰ Overdue:</strong> <span style="font-size: 20px; font-weight: bold; color: #ef4444;">${overdue}</span> items</li>
+                      </ul>
+                      <p style="margin-top: 20px; color: #667eea; font-size: 14px;"><a href="transaction.html" style="color: #667eea; text-decoration: none; font-weight: bold;">→ View detailed transactions</a></p>
+                    </div>
+                  </div>
+                `;
+                break;
+            }
+
+            if (modalBody) {
+              modalBody.innerHTML = content;
+            }
+            if (modal) {
+              modal.style.display = 'flex';
+            }
+          }
+
+          function closeCardModal() {
+            const modal = document.getElementById('cardModal');
+            if (modal) {
+              modal.style.display = 'none';
+            }
+          }
+
+          // Close modal when clicking outside
+          window.addEventListener('click', function (event) {
+            const modal = document.getElementById('cardModal');
+            if (modal && event.target === modal) {
+              closeCardModal();
+            }
+          });
+
+          // Toggle Profile Dropdown
+          function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown) {
+              dropdown.classList.toggle('active');
+            }
+          }
+
+          // Close dropdown when clicking outside
+          window.addEventListener('click', function (event) {
+            const dropdown = document.getElementById('profileDropdown');
+            const profileBtn = document.querySelector('.admin-profile-btn');
+            if (dropdown && profileBtn && !dropdown.contains(event.target) && !profileBtn.contains(event.target)) {
+              dropdown.classList.remove('active');
+            }
+          });
+
+          // Logout function
+          function logout() {
+            if (!confirm('Are you sure you want to logout?')) return;
+            try {
+              localStorage.removeItem('currentUser');
+              localStorage.removeItem('dcpUserType');
+              sessionStorage.clear();
+            } catch (e) { 
+              console.warn('Logout cleanup failed', e); 
+            }
+            window.location.href = 'student login.html';
+          }
+
+          // Edit profile function (kept for compatibility)
+          function editProfileClick() {
+            if (typeof showEditProfile === 'function') return showEditProfile();
+            window.location.href = 'developer-settings.html';
+          }
+
+          // Load admin profile on page load
+          function loadAdminProfile() {
+            // Prefer adminUsername/adminEmail from localStorage for profile display
+            const profileUsername = document.getElementById('profileUsername');
+            const profileEmail = document.getElementById('profileEmail');
+            const name = localStorage.getItem('adminUsername');
+            const email = localStorage.getItem('adminEmail');
+            if (profileUsername) {
+              profileUsername.textContent = name || 'Administrator';
+            }
+            if (profileEmail) {
+              profileEmail.textContent = email || 'admin@logbook.com';
+            }
+          }
+
+          // Initialize on page load
+          window.addEventListener('DOMContentLoaded', function () {
+            loadAdminProfile();
+          });
+
+          // Load dashboard data on page load
+          window.addEventListener('load', function () {
+            loadDashboardData();
+          });
+        </script>
+
+        <script src="js/profile.js"></script>
+        <script src="/js/dashboard.js"></script>
+</body>
+</html>

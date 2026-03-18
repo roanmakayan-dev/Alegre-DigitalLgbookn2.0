@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Real Estate App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: #f5f5f5;
+            overflow-x: hidden;
+        }
+        
+        .phone-frame {
+            max-width: 414px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.1);
+        }
+        
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .property-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .property-card:active {
+            transform: scale(0.98);
+        }
+        
+        .category-pill {
+            transition: all 0.3s ease;
+        }
+        
+        .category-pill.active {
+            background: #10b981;
+            color: white;
+        }
+        
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active {
+            color: #10b981;
+        }
+        
+        .nav-item.active i {
+            background: #d1fae5;
+            padding: 8px 24px;
+            border-radius: 20px;
+        }
+        
+        .heart-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .heart-btn.liked {
+            color: #ef4444;
+            background: #fee2e2;
+        }
+        
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .map-pin {
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <!-- Header - Home -->
+        <div id="header-home" class="px-6 pt-12 pb-4 bg-white sticky top-0 z-50">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border-2 border-emerald-500">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" alt="Profile" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">Hi, <span class="font-semibold text-gray-800">Hasib</span></p>
+                        <div class="flex items-center gap-1 text-xs text-gray-600">
+                            <i class="fas fa-map-marker-alt text-emerald-500"></i>
+                            <span>London, UK</span>
+                            <i class="fas fa-chevron-down text-xs ml-1"></i>
+                        </div>
+                    </div>
+                </div>
+                <button class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center relative">
+                    <i class="fas fa-bell text-gray-600"></i>
+                    <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="relative">
+                <input type="text" placeholder="Search" class="search-input w-full bg-gray-50 rounded-2xl py-3 pl-12 pr-12 text-sm outline-none transition-all">
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <button class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-emerald-500 rounded-xl flex items-center justify-center text-white">
+                    <i class="fas fa-sliders-h text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Header - Explore -->
+        <div id="header-explore" class="px-6 pt-12 pb-4 bg-white sticky top-0 z-50 hidden">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="relative flex-1">
+                    <input type="text" placeholder="Search" class="search-input w-full bg-gray-50 rounded-2xl py-3 pl-12 pr-4 text-sm outline-none">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <button class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                    <i class="fas fa-sliders-h text-sm"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Home Page -->
+        <div id="page-home" class="page active pb-24">
+            <!-- Categories -->
+            <div class="px-6 mb-6">
+                <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2">
+                    <button class="category-pill active px-5 py-2 rounded-full bg-emerald-500 text-white text-sm font-medium whitespace-nowrap flex items-center gap-2">
+                        <i class="fas fa-th-large text-xs"></i>
+                        All Category
+                    </button>
+                    <button class="category-pill px-5 py-2 rounded-full bg-gray-100 text-gray-600 text-sm font-medium whitespace-nowrap flex items-center gap-2">
+                        <i class="fas fa-home text-xs"></i>
+                        House
+                    </button>
+                    <button class="category-pill px-5 py-2 rounded-full bg-gray-100 text-gray-600 text-sm font-medium whitespace-nowrap flex items-center gap-2">
+                        <i class="fas fa-building text-xs"></i>
+                        Apartment
+                    </button>
+                    <button class="category-pill px-5 py-2 rounded-full bg-gray-100 text-gray-600 text-sm font-medium whitespace-nowrap flex items-center gap-2">
+                        <i class="fas fa-warehouse text-xs"></i>
+                        Villa
+                    </button>
+                </div>
+            </div>
+
+            <!-- Featured Properties -->
+            <div class="px-6 mb-8">
+                <div class="flex gap-4 overflow-x-auto hide-scrollbar pb-4">
+                    <!-- Property Card 1 -->
+                    <div class="property-card min-w-[280px] bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100">
+                        <div class="relative h-48">
+                            <img src="https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=600&h=400&fit=crop" alt="Japanese House" class="w-full h-full object-cover">
+                            <button class="heart-btn absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-gray-400 hover:scale-110">
+                                <i class="fas fa-heart text-sm"></i>
+                            </button>
+                            <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold text-gray-800">
+                                <i class="fas fa-star text-yellow-400 mr-1"></i>4.8
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-gray-800 mb-1">Blossomwood House</h3>
+                            <p class="text-xs text-gray-500 mb-3"><i class="fas fa-map-marker-alt mr-1"></i>Tokyo, Japan</p>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-emerald-500 font-bold text-lg">$740</span>
+                                    <span class="text-gray-400 text-xs">/month</span>
+                                </div>
+                                <div class="flex gap-2 text-xs text-gray-500">
+                                    <span><i class="fas fa-bed mr-1"></i>3</span>
+                                    <span><i class="fas fa-bath mr-1"></i>2</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Property Card 2 -->
+                    <div class="property-card min-w-[280px] bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100">
+                        <div class="relative h-48">
+                            <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=400&fit=crop" alt="Apartment" class="w-full h-full object-cover">
+                            <button class="heart-btn absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-gray-400 hover:scale-110">
+                                <i class="fas fa-heart text-sm"></i>
+                            </button>
+                            <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold text-gray-800">
+                                <i class="fas fa-star text-yellow-400 mr-1"></i>4.9
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-gray-800 mb-1">Corner Apartment</h3>
+                            <p class="text-xs text-gray-500 mb-3"><i class="fas fa-map-marker-alt mr-1"></i>New York, USA</p>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-emerald-500 font-bold text-lg">$850</span>
+                                    <span class="text-gray-400 text-xs">/month</span>
+                                </div>
+                                <div class="flex gap-2 text-xs text-gray-500">
+                                    <span><i class="fas fa-bed mr-1"></i>2</span>
+                                    <span><i class="fas fa-bath mr-1"></i>1</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommended For You -->
+            <div class="px-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-semibold text-gray-800">Recommended For You</h2>
+                    <button class="text-emerald-500 text-sm font-medium">See All</button>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Rec Card 1 -->
+                    <div class="property-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+                        <div class="relative h-32">
+                            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=300&fit=crop" alt="Modern House" class="w-full h-full object-cover">
+                            <button class="heart-btn absolute top-2 right-2 w-7 h-7 bg-white/90 rounded-full flex items-center justify-center text-gray-400 text-xs">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="p-3">
+                            <h4 class="font-medium text-sm text-gray-800 mb-1">Modern House</h4>
+                            <div class="flex items-center justify-between">
+                                <span class="text-emerald-500 font-bold text-sm">$520<span class="text-gray-400 text-xs font-normal">/mo</span></span>
+                                <span class="text-xs text-gray-400">2bd</span>
+                            </div>
+                            <button class="w-full mt-2 py-1.5 bg-emerald-500 text-white text-xs rounded-lg font-medium">Booking</button>
+                        </div>
+                    </div>
+
+                    <!-- Rec Card 2 -->
+                    <div class="property-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+                        <div class="relative h-32">
+                            <img src="https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=400&h=300&fit=crop" alt="Cottage" class="w-full h-full object-cover">
+                            <button class="heart-btn absolute top-2 right-2 w-7 h-7 bg-white/90 rounded-full flex items-center justify-center text-gray-400 text-xs">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="p-3">
+                            <h4 class="font-medium text-sm text-gray-800 mb-1">Cottage House</h4>
+                            <div class="flex items-center justify-between">
+                                <span class="text-emerald-500 font-bold text-sm">$720<span class="text-gray-400 text-xs font-normal">/mo</span></span>
+                                <span class="text-xs text-gray-400">3bd</span>
+                            </div>
+                            <button class="w-full mt-2 py-1.5 bg-emerald-500 text-white text-xs rounded-lg font-medium">Booking</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Explore Page -->
+        <div id="page-explore" class="page pb-24">
+            <!-- Map View -->
+            <div class="px-6 mb-6">
+                <div class="relative h-64 bg-gray-100 rounded-3xl overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&h=600&fit=crop" alt="Map" class="w-full h-full object-cover opacity-80">
+                    
+                    <!-- Map Pins -->
+                    <div class="absolute top-1/4 left-1/4 map-pin">
+                        <div class="bg-emerald-500 text-white px-3 py-1 rounded-lg text-xs font-bold shadow-lg">
+                            $450
+                        </div>
+                        <div class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-emerald-500 mx-auto"></div>
+                    </div>
+                    
+                    <div class="absolute top-1/2 right-1/3 map-pin" style="animation-delay: 0.5s">
+                        <div class="bg-red-500 text-white px-3 py-1 rounded-lg text-xs font-bold shadow-lg">
+                            $890
+                        </div>
+                        <div class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-red-500 mx-auto"></div>
+                    </div>
+                    
+                    <div class="absolute bottom-1/3 left-1/2 map-pin" style="animation-delay: 1s">
+                        <div class="bg-blue-500 text-white px-3 py-1 rounded-lg text-xs font-bold shadow-lg">
+                            $620
+                        </div>
+                        <div class="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-blue-500 mx-auto"></div>
+                    </div>
+
+                    <!-- Map Controls -->
+                    <div class="absolute bottom-4 right-4 flex flex-col gap-2">
+                        <button class="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-600 hover:bg-gray-50">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button class="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-600 hover:bg-gray-50">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <button class="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-600 hover:bg-gray-50">
+                            <i class="fas fa-location-arrow"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="px-6 mb-6">
+                <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2">
+                    <button class="category-pill active px-5 py-2 rounded-full bg-emerald-500 text-white text-sm font-medium whitespace-nowrap flex items-center gap-2">
+                        <i class="fas fa-th-large text-xs"></i>
+                        All Category
+                    </button>
+                    <button class="category-pill px-5 py-2 rounded-full bg-gray-100 text-gray-600 text-sm font-medium whitespace-nowrap flex items-center gap-2">
+                        <i class="fas fa-home text-xs"></i>
+                        House
+                    </button>
+                    <button class="category-pill px-5 py-2 rounded-full bg-gray-100 text-gray-600 text-sm font-medium whitespace-nowrap flex items-center gap-2">
+                        <i class="fas fa-building text-xs"></i>
+                        Apartment
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product List -->
+            <div class="px-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-semibold text-gray-800">Product <span class="text-gray-400 font-normal">(458)</span></h2>
+                    <button class="text-emerald-500 text-sm font-medium">See All</button>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Product 1 -->
+                    <div class="property-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+                        <div class="relative h-32">
+                            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop" alt="Modern House" class="w-full h-full object-cover">
+                            <button class="heart-btn absolute top-2 right-2 w-7 h-7 bg-white/90 rounded-full flex items-center justify-center text-gray-400 text-xs">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="p-3">
+                            <h4 class="font-medium text-sm text-gray-800 mb-1">Modern House</h4>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-emerald-500 font-bold text-sm">$850<span class="text-gray-400 text-xs font-normal">/mo</span></span>
+                            </div>
+                            <button class="w-full py-1.5 bg-emerald-500 text-white text-xs rounded-lg font-medium">Booking</button>
+                        </div>
+                    </div>
+
+                    <!-- Product 2 -->
+                    <div class="property-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+                        <div class="relative h-32">
+                            <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=300&fit=crop" alt="Estate House" class="w-full h-full object-cover">
+                            <button class="heart-btn absolute top-2 right-2 w-7 h-7 bg-white/90 rounded-full flex items-center justify-center text-gray-400 text-xs">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="p-3">
+                            <h4 class="font-medium text-sm text-gray-800 mb-1">Estate House</h4>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-emerald-500 font-bold text-sm">$920<span class="text-gray-400 text-xs font-normal">/mo</span></span>
+                            </div>
+                            <button class="w-full py-1.5 bg-emerald-500 text-white text-xs rounded-lg font-medium">Booking</button>
+                        </div>
+                    </div>
+
+                    <!-- Product 3 -->
+                    <div class="property-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+                        <div class="relative h-32">
+                            <img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=400&h=300&fit=crop" alt="Cottage House" class="w-full h-full object-cover">
+                            <button class="heart-btn absolute top-2 right-2 w-7 h-7 bg-white/90 rounded-full flex items-center justify-center text-gray-400 text-xs">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="p-3">
+                            <h4 class="font-medium text-sm text-gray-800 mb-1">Cottage House</h4>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-emerald-500 font-bold text-sm">$650<span class="text-gray-400 text-xs font-normal">/mo</span></span>
+                            </div>
+                            <button class="w-full py-1.5 bg-emerald-500 text-white text-xs rounded-lg font-medium">Booking</button>
+                        </div>
+                    </div>
+
+                    <!-- Product 4 -->
+                    <div class="property-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+                        <div class="relative h-32">
+                            <img src="https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=400&h=300&fit=crop" alt="Emerald House" class="w-full h-full object-cover">
+                            <button class="heart-btn absolute top-2 right-2 w-7 h-7 bg-white/90 rounded-full flex items-center justify-center text-gray-400 text-xs">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="p-3">
+                            <h4 class="font-medium text-sm text-gray-800 mb-1">Emerald House</h4>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-emerald-500 font-bold text-sm">$780<span class="text-gray-400 text-xs font-normal">/mo</span></span>
+                            </div>
+                            <button class="w-full py-1.5 bg-emerald-500 text-white text-xs rounded-lg font-medium">Booking</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Favorites Page -->
+        <div id="page-favorites" class="page pb-24">
+            <div class="px-6 pt-12 pb-4">
+                <h1 class="text-2xl font-bold text-gray-800">Favorites</h1>
+                <p class="text-gray-500 text-sm mt-1">Your saved properties</p>
+            </div>
+            
+            <div class="px-6 space-y-4">
+                <div class="property-card bg-white rounded-2xl p-3 flex gap-3 shadow-sm border border-gray-100">
+                    <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&h=200&fit=crop" class="w-24 h-24 rounded-xl object-cover">
+                    <div class="flex-1 py-1">
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-semibold text-gray-800">Modern House</h4>
+                            <button class="text-red-500 w-8 h-8 bg-red-50 rounded-full flex items-center justify-center">
+                                <i class="fas fa-heart text-sm"></i>
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-2"><i class="fas fa-map-marker-alt mr-1"></i>London, UK</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-emerald-500 font-bold">$520<span class="text-gray-400 text-xs font-normal">/mo</span></span>
+                            <button class="px-4 py-1.5 bg-emerald-500 text-white text-xs rounded-lg">Book</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="property-card bg-white rounded-2xl p-3 flex gap-3 shadow-sm border border-gray-100">
+                    <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=200&h=200&fit=crop" class="w-24 h-24 rounded-xl object-cover">
+                    <div class="flex-1 py-1">
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-semibold text-gray-800">Estate House</h4>
+                            <button class="text-red-500 w-8 h-8 bg-red-50 rounded-full flex items-center justify-center">
+                                <i class="fas fa-heart text-sm"></i>
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-2"><i class="fas fa-map-marker-alt mr-1"></i>Manchester, UK</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-emerald-500 font-bold">$920<span class="text-gray-400 text-xs font-normal">/mo</span></span>
+                            <button class="px-4 py-1.5 bg-emerald-500 text-white text-xs rounded-lg">Book</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div id="page-profile" class="page pb-24">
+            <div class="px-6 pt-12 pb-6">
+                <div class="text-center">
+                    <div class="w-24 h-24 rounded-full bg-gray-200 mx-auto mb-4 overflow-hidden border-4 border-emerald-100">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop" class="w-full h-full object-cover">
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-800">Hasibur Rahman</h2>
+                    <p class="text-gray-500 text-sm">hasib@example.com</p>
+                </div>
+            </div>
+
+            <div class="px-6 space-y-2">
+                <button class="w-full bg-white p-4 rounded-2xl flex items-center justify-between shadow-sm border border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-500">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span class="font-medium text-gray-800">Edit Profile</span>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400"></i>
+                </button>
+
+                <button class="w-full bg-white p-4 rounded-2xl flex items-center justify-between shadow-sm border border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-500">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <span class="font-medium text-gray-800">Notifications</span>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400"></i>
+                </button>
+
+                <button class="w-full bg-white p-4 rounded-2xl flex items-center justify-between shadow-sm border border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-500">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <span class="font-medium text-gray-800">Security</span>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400"></i>
+                </button>
+
+                <button class="w-full bg-white p-4 rounded-2xl flex items-center justify-between shadow-sm border border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-orange-500">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <span class="font-medium text-gray-800">Settings</span>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400"></i>
+                </button>
+
+                <button class="w-full bg-white p-4 rounded-2xl flex items-center justify-between shadow-sm border border-gray-100 mt-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center text-red-500">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </div>
+                        <span class="font-medium text-red-500">Logout</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-6 py-3 flex justify-between items-center max-w-[414px] mx-auto z-50">
+            <button class="nav-item active flex flex-col items-center gap-1 text-gray-400" onclick="switchTab('home')">
+                <i class="fas fa-home text-xl px-6 py-2 rounded-full transition-all"></i>
+                <span class="text-[10px] font-medium">Home</span>
+            </button>
+            
+            <button class="nav-item flex flex-col items-center gap-1 text-gray-400" onclick="switchTab('explore')">
+                <i class="fas fa-compass text-xl px-6 py-2 rounded-full transition-all"></i>
+                <span class="text-[10px] font-medium">Explore</span>
+            </button>
+            
+            <button class="nav-item flex flex-col items-center gap-1 text-gray-400" onclick="switchTab('favorites')">
+                <i class="fas fa-heart text-xl px-6 py-2 rounded-full transition-all"></i>
+                <span class="text-[10px] font-medium">Favorites</span>
+            </button>
+            
+            <button class="nav-item flex flex-col items-center gap-1 text-gray-400" onclick="switchTab('profile')">
+                <i class="fas fa-user text-xl px-6 py-2 rounded-full transition-all"></i>
+                <span class="text-[10px] font-medium">Profile</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(`page-${tab}`).classList.add('active');
+            
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Handle headers
+            if (tab === 'home') {
+                document.getElementById('header-home').classList.remove('hidden');
+                document.getElementById('header-explore').classList.add('hidden');
+            } else if (tab === 'explore') {
+                document.getElementById('header-home').classList.add('hidden');
+                document.getElementById('header-explore').classList.remove('hidden');
+            } else {
+                document.getElementById('header-home').classList.add('hidden');
+                document.getElementById('header-explore').classList.add('hidden');
+            }
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // Heart button toggle
+        document.querySelectorAll('.heart-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                this.classList.toggle('liked');
+                if (this.classList.contains('liked')) {
+                    this.innerHTML = '<i class="fas fa-heart text-sm"></i>';
+                } else {
+                    this.innerHTML = '<i class="fas fa-heart text-sm"></i>';
+                }
+            });
+        });
+
+        // Category pills toggle
+        document.querySelectorAll('.category-pill').forEach(pill => {
+            pill.addEventListener('click', function() {
+                // Find parent container
+                const container = this.parentElement;
+                container.querySelectorAll('.category-pill').forEach(p => {
+                    p.classList.remove('active', 'bg-emerald-500', 'text-white');
+                    p.classList.add('bg-gray-100', 'text-gray-600');
+                });
+                this.classList.remove('bg-gray-100', 'text-gray-600');
+                this.classList.add('active', 'bg-emerald-500', 'text-white');
+            });
+        });
+
+        // Booking buttons
+        document.querySelectorAll('button').forEach(btn => {
+            if (btn.textContent.includes('Booking') || btn.textContent.includes('Book')) {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Create toast notification
+                    const toast = document.createElement('div');
+                    toast.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full text-sm font-medium z-50 shadow-lg';
+                    toast.innerHTML = '<i class="fas fa-check-circle text-emerald-400 mr-2"></i>Booking request sent!';
+                    document.body.appendChild(toast);
+                    
+                    setTimeout(() => {
+                        toast.style.opacity = '0';
+                        toast.style.transition = 'opacity 0.3s';
+                        setTimeout(() => toast.remove(), 300);
+                    }, 2000);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
